@@ -8,10 +8,11 @@ import { WeekView } from './components/calendar/WeekView';
 import { YearView } from './components/calendar/YearView';
 import { AgendaView } from './components/calendar/AgendaView';
 import { TaskModal } from './components/tasks/TaskModal';
+import { CloudSyncModal } from './components/common/CloudSyncModal';
 import { Footer } from './components/layout/Footer';
 
 const CalendarContent: React.FC = () => {
-  const { view } = useCalendar();
+  const { view, isCloudModalOpen, closeCloudModal } = useCalendar();
 
   return (
     <div className="min-h-screen flex flex-col bg-[#FAF8F5] text-slate-800">
@@ -26,6 +27,7 @@ const CalendarContent: React.FC = () => {
       </main>
 
       <TaskModal />
+      <CloudSyncModal isOpen={isCloudModalOpen} onClose={closeCloudModal} />
       <Footer />
     </div>
   );

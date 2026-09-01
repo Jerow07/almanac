@@ -16,7 +16,8 @@ import {
   Upload,
   Sparkles,
   CalendarDays,
-  ListTodo
+  ListTodo,
+  Cloud,
 } from 'lucide-react';
 
 export const Header: React.FC = () => {
@@ -30,6 +31,8 @@ export const Header: React.FC = () => {
     openNewTaskModal,
     exportTasksBackup,
     importTasksFromFile,
+    openCloudModal,
+    isCloudConnected,
   } = useCalendar();
 
   const { unreadCount } = useNotification();
@@ -75,9 +78,6 @@ export const Header: React.FC = () => {
                 <h1 className="text-lg sm:text-xl font-extrabold tracking-tight bg-gradient-to-r from-pink-600 via-purple-600 to-blue-600 bg-clip-text text-transparent">
                   Almanac
                 </h1>
-                <span className="hidden sm:inline-block px-2 py-0.5 text-[10px] font-bold rounded-full bg-pink-50 text-pink-600 border border-pink-200">
-                  Pareja
-                </span>
               </div>
               <p className="text-[11px] font-medium text-slate-500 flex items-center gap-1">
                 <span className="text-blue-600 font-semibold">Jerónimo</span>
@@ -119,6 +119,27 @@ export const Header: React.FC = () => {
 
           {/* Right Action Icons */}
           <div className="flex items-center gap-1.5 sm:gap-2">
+            {/* Cloud Sync Button */}
+            <button
+              type="button"
+              onClick={openCloudModal}
+              className={`p-2 rounded-xl border transition-all flex items-center gap-1.5 text-xs font-bold ${
+                isCloudConnected
+                  ? 'bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-100'
+                  : 'bg-slate-50 text-slate-500 border-slate-200 hover:bg-slate-100'
+              }`}
+              title={isCloudConnected ? 'Sincronización en la Nube Activa (En Vivo)' : 'Conectar con la Nube para sincronizar'}
+            >
+              {isCloudConnected ? (
+                <Cloud className="w-4 h-4 text-emerald-600 fill-emerald-100" />
+              ) : (
+                <Cloud className="w-4 h-4 text-slate-400" />
+              )}
+              <span className="hidden sm:inline text-[11px]">
+                {isCloudConnected ? 'En Vivo' : 'Conectar Nube'}
+              </span>
+            </button>
+
             {/* Sound Toggle */}
             <button
               type="button"
