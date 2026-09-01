@@ -23,8 +23,15 @@ export const NotificationDrawer: React.FC<NotificationDrawerProps> = ({ isOpen, 
   if (!isOpen) return null;
 
   return (
-    <div className="absolute right-0 top-14 w-80 sm:w-96 bg-white rounded-3xl shadow-2xl border border-pink-100 z-50 overflow-hidden animate-in fade-in zoom-in-95 duration-150">
-      {/* Header */}
+    <>
+      {/* Mobile backdrop */}
+      <div
+        className="fixed inset-0 bg-slate-900/40 backdrop-blur-xs z-40 sm:hidden"
+        onClick={onClose}
+      />
+
+      <div className="fixed inset-x-3 top-16 sm:absolute sm:inset-x-auto sm:right-0 sm:top-14 w-auto sm:w-96 bg-white rounded-3xl shadow-2xl border border-pink-100 z-50 overflow-hidden animate-in fade-in zoom-in-95 duration-150 max-h-[85vh] flex flex-col">
+        {/* Header */}
       <div className="flex items-center justify-between px-4 py-3 bg-gradient-to-r from-pink-50 to-purple-50 border-b border-pink-100/60">
         <div className="flex items-center gap-2">
           <BellRing className="w-4 h-4 text-pink-500" />
@@ -147,5 +154,6 @@ export const NotificationDrawer: React.FC<NotificationDrawerProps> = ({ isOpen, 
         </button>
       </div>
     </div>
-  );
+  </>
+);
 };
