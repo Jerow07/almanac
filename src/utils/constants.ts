@@ -1,0 +1,112 @@
+import { CategoryInfo, UserProfileInfo, Task } from '../types';
+
+export const PROFILES: Record<string, UserProfileInfo> = {
+  jeronimo: {
+    id: 'jeronimo',
+    name: 'Jerónimo',
+    shortName: 'Jero',
+    avatarColor: 'bg-blue-500 text-white',
+    badgeBg: 'bg-blue-50 text-blue-700 border-blue-200',
+    badgeText: 'text-blue-700',
+    borderColor: 'border-blue-300',
+    icon: '👨🏻‍💻',
+  },
+  zahria: {
+    id: 'zahria',
+    name: 'Zahria',
+    shortName: 'Zahri',
+    avatarColor: 'bg-pink-500 text-white',
+    badgeBg: 'bg-pink-50 text-pink-700 border-pink-200',
+    badgeText: 'text-pink-700',
+    borderColor: 'border-pink-300',
+    icon: '👩🏻‍🎨',
+  },
+  both: {
+    id: 'both',
+    name: 'Ambos / Juntos',
+    shortName: 'Juntos',
+    avatarColor: 'bg-gradient-to-r from-pink-500 via-purple-500 to-blue-500 text-white',
+    badgeBg: 'bg-purple-50 text-purple-700 border-purple-200',
+    badgeText: 'text-purple-700',
+    borderColor: 'border-purple-300',
+    icon: '💑',
+  }
+};
+
+export const CATEGORIES: CategoryInfo[] = [
+  { id: 'pareja', name: 'Cita / Pareja', icon: '❤️', color: 'text-pink-500', badgeBg: 'bg-pink-100/70', badgeText: 'text-pink-700' },
+  { id: 'hogar', name: 'Hogar & Casa', icon: '🏠', color: 'text-amber-500', badgeBg: 'bg-amber-100/70', badgeText: 'text-amber-700' },
+  { id: 'compras', name: 'Compras & Super', icon: '🛒', color: 'text-emerald-500', badgeBg: 'bg-emerald-100/70', badgeText: 'text-emerald-700' },
+  { id: 'finanzas', name: 'Finanzas & Pagos', icon: '💳', color: 'text-indigo-500', badgeBg: 'bg-indigo-100/70', badgeText: 'text-indigo-700' },
+  { id: 'salud', name: 'Salud & Bienestar', icon: '🩺', color: 'text-teal-500', badgeBg: 'bg-teal-100/70', badgeText: 'text-teal-700' },
+  { id: 'viajes', name: 'Viajes & Salidas', icon: '✈️', color: 'text-sky-500', badgeBg: 'bg-sky-100/70', badgeText: 'text-sky-700' },
+  { id: 'trabajo', name: 'Trabajo & Proyectos', icon: '💼', color: 'text-violet-500', badgeBg: 'bg-violet-100/70', badgeText: 'text-violet-700' },
+  { id: 'otro', name: 'Recordatorio', icon: '📌', color: 'text-slate-500', badgeBg: 'bg-slate-100/70', badgeText: 'text-slate-700' },
+];
+
+export const INITIAL_TASKS: Task[] = [
+  {
+    id: 'demo-1',
+    title: 'Noche de cine & cena romántica',
+    description: 'Elegir una película linda y preparar algo rico juntos o pedir delivery.',
+    date: new Date().toISOString().split('T')[0], // Today
+    time: '21:00',
+    allDay: false,
+    assignee: 'both',
+    category: 'pareja',
+    priority: 'high',
+    completed: false,
+    recurrence: 'none',
+    reminder: '1_hour',
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  },
+  {
+    id: 'demo-2',
+    title: 'Hacer las compras de la semana en el super',
+    description: 'Frutas, verduras, café, leche y cositas para el desayuno.',
+    date: new Date(Date.now() + 86400000).toISOString().split('T')[0], // Tomorrow
+    time: '18:30',
+    allDay: false,
+    assignee: 'both',
+    category: 'compras',
+    priority: 'medium',
+    completed: false,
+    recurrence: 'weekly',
+    reminder: '1_hour',
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  },
+  {
+    id: 'demo-3',
+    title: 'Pagar servicio de internet y electricidad',
+    description: 'Hacer la transferencia bancaria antes del vencimiento mensual.',
+    date: new Date(Date.now() + 86400000 * 3).toISOString().split('T')[0],
+    time: '11:00',
+    allDay: false,
+    assignee: 'jeronimo',
+    category: 'finanzas',
+    priority: 'high',
+    completed: false,
+    recurrence: 'monthly',
+    reminder: '1_day',
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  },
+  {
+    id: 'demo-4',
+    title: 'Turno control médico de rutina',
+    description: 'Llevar los estudios médicos de control anual.',
+    date: new Date(Date.now() + 86400000 * 5).toISOString().split('T')[0],
+    time: '15:30',
+    allDay: false,
+    assignee: 'zahria',
+    category: 'salud',
+    priority: 'medium',
+    completed: false,
+    recurrence: 'none',
+    reminder: '1_day',
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  }
+];
