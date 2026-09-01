@@ -13,6 +13,8 @@ export interface AppNotification {
 class NotificationService {
   private notifiedTaskIds: Set<string> = new Set();
 
+  private swRegistration: ServiceWorkerRegistration | null = null;
+
   constructor() {
     try {
       const stored = localStorage.getItem('almanac_notified_tasks');
@@ -21,6 +23,21 @@ class NotificationService {
       }
     } catch {
       this.notifiedTaskIds = new Set();
+    }
+
+    this.registerServiceWorker();
+  }
+
+  public registerServiceWorker() {
+    if (typeof window !== 'undefined' && 'serviceWorker' in navigator) {
+      navigator.serviceWorker
+        .register('/sw.js')
+        .then((reg) => {
+          this.swRegistration = reg;
+        })
+        .catch((err) => {
+          console.warn('Service Worker registration failed:', err);
+        });
     }
   }
 
@@ -44,20 +61,35 @@ class NotificationService {
   }
 
   /**
-   * Display native system notification
+   * Display native system notification (Universal for iOS PWA, Android and Desktop)
    */
-  public showSystemNotification(title: string, options?: NotificationOptions) {
+  public async showSystemNotification(title: string, options?: NotificationOptions) {
     if (!this.isSupported() || Notification.permission !== 'granted') {
       return;
     }
 
-    try {
-      const n = new Notification(title, {
-        icon: '/calendar-heart.svg',
-        badge: '/calendar-heart.svg',
-        ...options,
-      });
+    const notifOptions: NotificationOptions = {
+      icon: '/calendar-heart.svg',
+      badge: '/calendar-heart.svg',
+      ...options,
+    };
 
+    // Priority 1: Service Worker showNotification (Mandatory for iOS 16.4+ PWA)
+    if ('serviceWorker' in navigator) {
+      try {
+        const reg = this.swRegistration || (await navigator.serviceWorker.ready);
+        if (reg && 'showNotification' in reg) {
+          await reg.showNotification(title, notifOptions);
+          return;
+        }
+      } catch {
+        // Fall back to standard Notification if SW fails
+      }
+    }
+
+    // Priority 2: Standard Desktop / Android browser Notification
+    try {
+      const n = new Notification(title, notifOptions);
       n.onclick = () => {
         window.focus();
         n.close();
