@@ -13,7 +13,7 @@ interface CloudSyncModalProps {
   onClose: () => void;
 }
 
-const SQL_SCHEMA = `CREATE TABLE IF NOT EXISTS tasks (
+const SQL_SCHEMA = `CREATE TABLE IF NOT EXISTS almanac_tasks (
   id TEXT PRIMARY KEY,
   title TEXT NOT NULL,
   description TEXT,
@@ -32,7 +32,15 @@ const SQL_SCHEMA = `CREATE TABLE IF NOT EXISTS tasks (
 );
 
 -- Habilitar tiempo real (Realtime)
-ALTER PUBLICATION supabase_realtime ADD TABLE tasks;
+ALTER PUBLICATION supabase_realtime ADD TABLE almanac_tasks;
+
+-- Habilitar acceso compartido
+ALTER TABLE almanac_tasks ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Acceso total para Almanac" ON almanac_tasks
+  FOR ALL
+  TO anon, authenticated
+  USING (true)
+  WITH CHECK (true);
 `;
 
 export const CloudSyncModal: React.FC<CloudSyncModalProps> = ({ isOpen, onClose }) => {
@@ -80,7 +88,7 @@ export const CloudSyncModal: React.FC<CloudSyncModalProps> = ({ isOpen, onClose 
       if (!client) throw new Error('No se pudo inicializar Supabase');
 
       // Test connection
-      const { error } = await client.from('tasks').select('id').limit(1);
+      const { error } = await client.from('almanac_tasks').select('id').limit(1);
       if (error) {
         throw error;
       }

@@ -105,7 +105,7 @@ export const CalendarProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       .channel('almanac_live_tasks')
       .on(
         'postgres_changes',
-        { event: '*', schema: 'public', table: 'tasks' },
+        { event: '*', schema: 'public', table: 'almanac_tasks' },
         (payload) => {
           if (payload.eventType === 'INSERT') {
             const newTask = mapDbToTask(payload.new);

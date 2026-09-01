@@ -107,7 +107,7 @@ export const supabaseSync = {
     if (!supabase) return null;
 
     const { data, error } = await supabase
-      .from('tasks')
+      .from('almanac_tasks')
       .select('*')
       .order('date', { ascending: true });
 
@@ -126,7 +126,7 @@ export const supabaseSync = {
     const supabase = getSupabase();
     if (!supabase) return false;
 
-    const { error } = await supabase.from('tasks').upsert(mapTaskToDb(task));
+    const { error } = await supabase.from('almanac_tasks').upsert(mapTaskToDb(task));
     if (error) {
       console.error('Supabase upsert error:', error);
       return false;
@@ -141,7 +141,7 @@ export const supabaseSync = {
     const supabase = getSupabase();
     if (!supabase) return false;
 
-    const { error } = await supabase.from('tasks').delete().eq('id', id);
+    const { error } = await supabase.from('almanac_tasks').delete().eq('id', id);
     if (error) {
       console.error('Supabase delete error:', error);
       return false;
@@ -157,7 +157,7 @@ export const supabaseSync = {
     if (!supabase) return false;
 
     const dbRows = tasks.map(mapTaskToDb);
-    const { error } = await supabase.from('tasks').upsert(dbRows);
+    const { error } = await supabase.from('almanac_tasks').upsert(dbRows);
     return !error;
   }
 };
