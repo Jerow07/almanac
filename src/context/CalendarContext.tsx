@@ -276,7 +276,7 @@ export const CalendarProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   const openNewTaskModal = (dateStr?: string) => {
     sounds.playPop();
     setEditingTask(null);
-    setSelectedDateForNewTask(dateStr || new Date().toISOString().split('T')[0]);
+    setSelectedDateForNewTask(dateStr || null);
     setIsTaskModalOpen(true);
   };
 

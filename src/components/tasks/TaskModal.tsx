@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { useCalendar } from '../../context/CalendarContext';
 import { Assignee, TaskCategory, Priority, RecurrenceType, ReminderOffset } from '../../types';
 import { CATEGORIES, PROFILES } from '../../utils/constants';
@@ -19,7 +20,7 @@ export const TaskModal: React.FC = () => {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [date, setDate] = useState('');
-  const [time, setTime] = useState('12:00');
+  const [time, setTime] = useState('');
   const [endTime, setEndTime] = useState('');
   const [allDay, setAllDay] = useState(false);
   const [assignee, setAssignee] = useState<Assignee>('both');
@@ -48,19 +49,21 @@ export const TaskModal: React.FC = () => {
       );
       setReminder(editingTask.reminder);
     } else {
-      // Default new task
-      const defaultDate = selectedDateForNewTask || new Date().toISOString().split('T')[0];
+      // Default new task: start completely blank (no forced date or time)
       setTitle('');
       setDescription('');
-      setDate(defaultDate);
-      setTime('10:00');
+      setDate(selectedDateForNewTask || '');
+      setTime('');
       setEndTime('');
       setAllDay(false);
       setAssignee('both');
       setCategory('pareja');
       setPriority('medium');
       setRecurrence('none');
-      setRecurrenceDays([parseISO(defaultDate).getDay()]);
+      const initialDay = selectedDateForNewTask
+        ? parseISO(selectedDateForNewTask).getDay()
+        : new Date().getDay();
+      setRecurrenceDays([initialDay]);
       setReminder('1_hour');
     }
   }, [editingTask, selectedDateForNewTask, isTaskModalOpen]);
@@ -122,14 +125,17 @@ export const TaskModal: React.FC = () => {
     }
   };
 
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm animate-in fade-in duration-200">
+  return createPortal(
+    <div
+      className="fixed inset-0 z-[9999] flex items-center justify-center p-3 sm:p-4 bg-slate-900/40 backdrop-blur-xs animate-in fade-in duration-150"
+      onClick={closeTaskModal}
+    >
       <div
-        className="relative w-full max-w-lg bg-white rounded-3xl shadow-2xl overflow-hidden border border-pink-100 flex flex-col max-h-[90vh]"
+        className="relative w-full max-w-xl bg-white rounded-3xl shadow-2xl overflow-hidden border border-pink-100 flex flex-col max-h-[90vh]"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 bg-gradient-to-r from-pink-50 via-purple-50 to-blue-50 border-b border-pink-100/60">
+        <div className="flex items-center justify-between px-6 py-4 bg-gradient-to-r from-pink-50 via-purple-50 to-blue-50 border-b border-pink-100/60 flex-shrink-0">
           <div className="flex items-center gap-2">
             <div className="w-8 h-8 rounded-full bg-white shadow-sm flex items-center justify-center text-pink-500">
               <Heart className="w-4 h-4 fill-pink-500 text-pink-500" />
@@ -144,14 +150,14 @@ export const TaskModal: React.FC = () => {
           <button
             type="button"
             onClick={closeTaskModal}
-            className="p-1.5 rounded-full text-slate-400 hover:text-slate-600 hover:bg-white/80 transition-all"
+            className="p-1.5 rounded-full text-slate-400 hover:text-slate-600 hover:bg-white/80 transition-all cursor-pointer"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
         {/* Scrollable form body */}
-        <form onSubmit={handleSubmit} className="p-6 overflow-y-auto space-y-4 text-slate-700">
+        <form onSubmit={handleSubmit} className="p-5 sm:p-6 overflow-y-auto overflow-x-hidden space-y-4 text-slate-700 flex-1">
           {/* Title */}
           <div>
             <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">
@@ -201,7 +207,7 @@ export const TaskModal: React.FC = () => {
           </div>
 
           {/* Date and Time */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
             <div>
               <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">
                 Fecha *
@@ -212,9 +218,9 @@ export const TaskModal: React.FC = () => {
                   required
                   value={date}
                   onChange={(e) => setDate(e.target.value)}
-                  className="w-full pl-9 pr-3 py-2 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-pink-400 text-sm"
+                  className="w-full pl-9 pr-3 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-pink-400 text-sm bg-white"
                 />
-                <Calendar className="w-4 h-4 text-slate-400 absolute left-3 top-2.5 pointer-events-none" />
+                <Calendar className="w-4 h-4 text-slate-400 absolute left-3 top-3 pointer-events-none" />
               </div>
             </div>
 
@@ -223,12 +229,12 @@ export const TaskModal: React.FC = () => {
                 <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider">
                   Hora
                 </label>
-                <label className="flex items-center gap-1.5 text-xs text-slate-500 cursor-pointer">
+                <label className="flex items-center gap-1.5 text-xs text-slate-500 cursor-pointer select-none">
                   <input
                     type="checkbox"
                     checked={allDay}
                     onChange={(e) => setAllDay(e.target.checked)}
-                    className="rounded text-pink-500 focus:ring-pink-400"
+                    className="rounded text-pink-500 focus:ring-pink-400 cursor-pointer"
                   />
                   <span>Todo el día</span>
                 </label>
@@ -237,27 +243,27 @@ export const TaskModal: React.FC = () => {
               {!allDay ? (
                 <div>
                   <div className="flex items-center gap-1.5">
-                    <div className="relative flex-1">
+                    <div className="relative flex-1 min-w-0">
                       <input
                         type="time"
                         value={time}
                         onChange={(e) => setTime(e.target.value)}
-                        className="w-full pl-8 pr-1 py-2 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-pink-400 text-xs font-semibold text-slate-700"
+                        className="w-full pl-7 pr-1 py-2 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-pink-400 text-xs font-semibold text-slate-700 bg-white"
                         title="Hora de inicio"
                       />
-                      <Clock className="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-2.5 pointer-events-none" />
+                      <Clock className="w-3.5 h-3.5 text-slate-400 absolute left-2 top-2.5 pointer-events-none" />
                     </div>
                     <span className="text-slate-400 text-xs font-bold px-0.5">a</span>
-                    <div className="relative flex-1">
+                    <div className="relative flex-1 min-w-0">
                       <input
                         type="time"
                         value={endTime}
                         onChange={(e) => setEndTime(e.target.value)}
                         placeholder="Hasta"
-                        className="w-full pl-8 pr-1 py-2 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-pink-400 text-xs font-semibold text-slate-700"
+                        className="w-full pl-7 pr-1 py-2 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-pink-400 text-xs font-semibold text-slate-700 bg-white"
                         title="Hora de fin (opcional)"
                       />
-                      <Clock className="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-2.5 pointer-events-none" />
+                      <Clock className="w-3.5 h-3.5 text-slate-400 absolute left-2 top-2.5 pointer-events-none" />
                     </div>
                   </div>
                   <p className="text-[10px] text-slate-400 mt-1 pl-1">
@@ -265,8 +271,8 @@ export const TaskModal: React.FC = () => {
                   </p>
                 </div>
               ) : (
-                <div className="py-2 px-3 bg-slate-50 text-slate-400 rounded-xl text-xs text-center border border-slate-100">
-                  Sin horario específico
+                <div className="py-2.5 px-3 bg-slate-50 text-slate-400 rounded-xl text-xs text-center border border-slate-100">
+                  Sin horario específico (todo el día)
                 </div>
               )}
             </div>
@@ -442,6 +448,7 @@ export const TaskModal: React.FC = () => {
           </div>
         </form>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 };
