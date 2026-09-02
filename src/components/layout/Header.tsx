@@ -2,7 +2,8 @@ import React, { useState, useRef, useEffect } from 'react';
 import { useCalendar } from '../../context/CalendarContext';
 import { useNotification } from '../../context/NotificationContext';
 import { NotificationDrawer } from '../notifications/NotificationDrawer';
-import { formatMonthHeader } from '../../utils/dateUtils';
+import { MonthPickerModal } from '../calendar/MonthPickerModal';
+import { formatMonthHeader, isSameMonth } from '../../utils/dateUtils';
 import {
   Calendar as CalendarIcon,
   CalendarDays,
@@ -10,6 +11,7 @@ import {
   ListTodo,
   ChevronLeft,
   ChevronRight,
+  ChevronDown,
   Plus,
   Heart,
   Volume2,
@@ -36,11 +38,14 @@ export const Header: React.FC = () => {
     isCloudConnected,
     currentUser,
     setCurrentUser,
+    setCurrentDate,
   } = useCalendar();
 
   const { unreadCount, notificationsEnabled } = useNotification();
   const [isNotifOpen, setIsNotifOpen] = useState(false);
   const [isBackupMenuOpen, setIsBackupMenuOpen] = useState(false);
+  const [isMonthPickerOpen, setIsMonthPickerOpen] = useState(false);
+  const isCurrentMonth = isSameMonth(currentDate, new Date());
   const fileInputRef = useRef<HTMLInputElement>(null);
   const headerRef = useRef<HTMLDivElement>(null);
 
@@ -118,33 +123,47 @@ export const Header: React.FC = () => {
           </div>
 
           {/* Center Date Navigator (Desktop & Tablet) */}
-          <div className="hidden md:flex items-center gap-2 bg-slate-50 p-1 rounded-2xl border border-slate-200/80 flex-shrink-0">
+          <div className="hidden md:flex items-center gap-1.5 bg-slate-50 p-1 rounded-2xl border border-slate-200/80 flex-shrink-0">
             <button
               type="button"
               onClick={() => navigateDate('prev')}
-              className="p-1.5 hover:bg-white text-slate-600 hover:text-slate-900 rounded-xl transition-all shadow-sm"
-              title="Anterior"
+              className="p-1.5 hover:bg-white text-slate-600 hover:text-slate-900 rounded-xl transition-all shadow-2xs cursor-pointer active:scale-95"
+              title="Mes anterior"
             >
               <ChevronLeft className="w-4 h-4" />
             </button>
+
+            {/* Quick Month Picker trigger */}
             <button
               type="button"
-              onClick={() => navigateDate('today')}
-              className="px-3 py-1 text-xs font-bold text-pink-600 hover:bg-pink-50 rounded-xl transition-all"
+              onClick={() => setIsMonthPickerOpen(true)}
+              className="flex items-center gap-1.5 px-3 py-1 text-xs font-extrabold text-slate-800 hover:text-pink-600 hover:bg-white rounded-xl transition-all cursor-pointer group shadow-2xs"
+              title="Toca para elegir mes o año rápidamente"
             >
-              Hoy
+              <span>{formatMonthHeader(currentDate)}</span>
+              <ChevronDown className="w-3.5 h-3.5 text-slate-400 group-hover:text-pink-500 transition-transform" />
             </button>
+
             <button
               type="button"
               onClick={() => navigateDate('next')}
-              className="p-1.5 hover:bg-white text-slate-600 hover:text-slate-900 rounded-xl transition-all shadow-sm"
-              title="Siguiente"
+              className="p-1.5 hover:bg-white text-slate-600 hover:text-slate-900 rounded-xl transition-all shadow-2xs cursor-pointer active:scale-95"
+              title="Mes siguiente"
             >
               <ChevronRight className="w-4 h-4" />
             </button>
-            <span className="px-3 py-1 text-xs font-bold text-slate-800 border-l border-slate-200">
-              {formatMonthHeader(currentDate)}
-            </span>
+
+            {!isCurrentMonth && (
+              <button
+                type="button"
+                onClick={() => navigateDate('today')}
+                className="ml-1 px-2.5 py-1 text-xs font-bold text-pink-600 bg-pink-50 hover:bg-pink-100 rounded-xl border border-pink-200/80 transition-all cursor-pointer flex items-center gap-1"
+                title="Volver al día de hoy"
+              >
+                <span>↩</span>
+                <span>Hoy</span>
+              </button>
+            )}
           </div>
 
           {/* Right Action Icons */}
@@ -302,28 +321,44 @@ export const Header: React.FC = () => {
               <button
                 type="button"
                 onClick={() => navigateDate('prev')}
-                className="p-1.5 rounded-lg border border-slate-200 text-slate-600"
+                className="p-1.5 rounded-xl border border-slate-200 text-slate-600 active:scale-95"
+                title="Mes anterior"
               >
                 <ChevronLeft className="w-3.5 h-3.5" />
               </button>
+
+              {/* Quick Month Picker trigger */}
               <button
                 type="button"
-                onClick={() => navigateDate('today')}
-                className="px-2.5 py-1 text-xs font-bold text-pink-600 bg-pink-50 rounded-lg"
+                onClick={() => setIsMonthPickerOpen(true)}
+                className="flex items-center gap-1 px-2.5 py-1 text-xs font-extrabold text-slate-800 hover:text-pink-600 bg-slate-50 border border-slate-200/80 rounded-xl transition-all active:scale-95 group"
+                title="Toca para elegir mes o año rápidamente"
               >
-                Hoy
+                <span>{formatMonthHeader(currentDate)}</span>
+                <ChevronDown className="w-3 h-3 text-slate-400 group-hover:text-pink-500" />
               </button>
+
               <button
                 type="button"
                 onClick={() => navigateDate('next')}
-                className="p-1.5 rounded-lg border border-slate-200 text-slate-600"
+                className="p-1.5 rounded-xl border border-slate-200 text-slate-600 active:scale-95"
+                title="Mes siguiente"
               >
                 <ChevronRight className="w-3.5 h-3.5" />
               </button>
             </div>
-            <span className="text-xs font-bold text-slate-800">
-              {formatMonthHeader(currentDate)}
-            </span>
+
+            {!isCurrentMonth && (
+              <button
+                type="button"
+                onClick={() => navigateDate('today')}
+                className="px-2 py-1 text-[11px] font-bold text-pink-600 bg-pink-50 border border-pink-200 rounded-xl flex items-center gap-1 active:scale-95"
+                title="Volver al mes actual"
+              >
+                <span>↩</span>
+                <span>Hoy</span>
+              </button>
+            )}
           </div>
 
           {/* View Selector Pills */}
@@ -382,6 +417,13 @@ export const Header: React.FC = () => {
           </div>
         </div>
       </div>
+
+      <MonthPickerModal
+        isOpen={isMonthPickerOpen}
+        onClose={() => setIsMonthPickerOpen(false)}
+        currentDate={currentDate}
+        onSelectDate={setCurrentDate}
+      />
     </header>
   );
 };
