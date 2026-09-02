@@ -48,7 +48,6 @@ export const Header: React.FC = () => {
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
       if (headerRef.current && !headerRef.current.contains(e.target as Node)) {
-        setIsNotifOpen(false);
         setIsBackupMenuOpen(false);
       }
     };

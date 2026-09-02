@@ -1,7 +1,7 @@
 import React from 'react';
 import { createPortal } from 'react-dom';
 import { useNotification } from '../../context/NotificationContext';
-import { Bell, Check, Trash2, BellRing, Sparkles, AlertCircle, BellOff } from 'lucide-react';
+import { Bell, Check, Trash2, BellRing, BellOff } from 'lucide-react';
 import { formatDistanceToNow, parseISO } from 'date-fns';
 import { es } from 'date-fns/locale';
 
@@ -15,9 +15,6 @@ export const NotificationDrawer: React.FC<NotificationDrawerProps> = ({ isOpen, 
     notifications,
     notificationsEnabled,
     toggleNotificationsEnabled,
-    permissionStatus,
-    isSupported,
-    requestPermission,
     markAsRead,
     markAllAsRead,
     clearNotifications,
@@ -27,14 +24,17 @@ export const NotificationDrawer: React.FC<NotificationDrawerProps> = ({ isOpen, 
 
   return createPortal(
     <>
-      {/* Full-screen Backdrop */}
+      {/* Full-screen Backdrop (closes modal on tap) */}
       <div
         className="fixed inset-0 bg-slate-900/40 backdrop-blur-xs z-[9998]"
         onClick={onClose}
       />
 
       {/* Floating Notification Card (Always on top of everything) */}
-      <div className="fixed inset-x-3 sm:inset-x-auto sm:right-6 top-16 w-auto sm:w-96 bg-white rounded-3xl shadow-2xl border border-pink-100 z-[9999] overflow-hidden animate-in fade-in zoom-in-95 duration-150 max-h-[85vh] flex flex-col">
+      <div
+        onClick={(e) => e.stopPropagation()}
+        className="fixed inset-x-3 sm:inset-x-auto sm:right-6 top-16 w-auto sm:w-96 bg-white rounded-3xl shadow-2xl border border-pink-100 z-[9999] overflow-hidden animate-in fade-in zoom-in-95 duration-150 max-h-[85vh] flex flex-col"
+      >
         {/* Header */}
         <div className="flex items-center justify-between px-4 py-3 bg-gradient-to-r from-pink-50 to-purple-50 border-b border-pink-100/60">
           <div className="flex items-center gap-2">
@@ -48,7 +48,7 @@ export const NotificationDrawer: React.FC<NotificationDrawerProps> = ({ isOpen, 
               <button
                 type="button"
                 onClick={markAllAsRead}
-                className="text-pink-600 hover:text-pink-700 font-medium"
+                className="text-pink-600 hover:text-pink-700 font-medium cursor-pointer"
                 title="Marcar todas como leídas"
               >
                 Leídas
@@ -57,7 +57,7 @@ export const NotificationDrawer: React.FC<NotificationDrawerProps> = ({ isOpen, 
               <button
                 type="button"
                 onClick={clearNotifications}
-                className="text-slate-400 hover:text-rose-500"
+                className="text-slate-400 hover:text-rose-500 cursor-pointer"
                 title="Limpiar avisos"
               >
                 <Trash2 className="w-3.5 h-3.5" />
@@ -67,18 +67,22 @@ export const NotificationDrawer: React.FC<NotificationDrawerProps> = ({ isOpen, 
         </div>
 
         {/* Master In-App Notifications Switch */}
-        <div className="flex items-center justify-between px-4 py-2.5 bg-slate-50/80 border-b border-slate-100 text-xs">
-          <div className="flex items-center gap-2">
+        <div className="flex items-center justify-between px-4 py-3 bg-slate-50/90 border-b border-slate-100 text-xs">
+          <div className="flex items-center gap-2.5">
             {notificationsEnabled ? (
-              <Bell className="w-4 h-4 text-pink-500" />
+              <div className="w-8 h-8 rounded-xl bg-pink-100 text-pink-600 flex items-center justify-center flex-shrink-0">
+                <Bell className="w-4 h-4" />
+              </div>
             ) : (
-              <BellOff className="w-4 h-4 text-slate-400" />
+              <div className="w-8 h-8 rounded-xl bg-slate-200 text-slate-500 flex items-center justify-center flex-shrink-0">
+                <BellOff className="w-4 h-4" />
+              </div>
             )}
             <div>
-              <p className="font-bold text-slate-700">
-                {notificationsEnabled ? 'Avisos en la app: Activos' : 'Avisos en la app: En Pausa'}
+              <p className="font-bold text-slate-800 text-xs">
+                {notificationsEnabled ? 'Avisos: Activos' : 'Avisos: En Pausa'}
               </p>
-              <p className="text-[10px] text-slate-400">
+              <p className="text-[11px] text-slate-500">
                 {notificationsEnabled
                   ? 'Recibes alertas de planes y tareas'
                   : 'Silenciados dentro de Almanac'}
@@ -89,56 +93,22 @@ export const NotificationDrawer: React.FC<NotificationDrawerProps> = ({ isOpen, 
           {/* Toggle Switch */}
           <button
             type="button"
-            onClick={toggleNotificationsEnabled}
-            className={`w-11 h-6 flex items-center rounded-full p-0.5 transition-colors cursor-pointer ${
+            onClick={(e) => {
+              e.stopPropagation();
+              toggleNotificationsEnabled();
+            }}
+            className={`w-12 h-6 flex items-center rounded-full p-0.5 transition-colors cursor-pointer flex-shrink-0 ${
               notificationsEnabled ? 'bg-pink-500' : 'bg-slate-300'
             }`}
             title={notificationsEnabled ? 'Pausar avisos' : 'Activar avisos'}
           >
             <div
               className={`bg-white w-5 h-5 rounded-full shadow-md transform transition-transform duration-200 ${
-                notificationsEnabled ? 'translate-x-5' : 'translate-x-0'
+                notificationsEnabled ? 'translate-x-6' : 'translate-x-0'
               }`}
             />
           </button>
         </div>
-
-        {/* Permission banner if needed */}
-        {isSupported && permissionStatus === 'denied' && (
-          <div className="p-3.5 bg-rose-50 border-b border-rose-100/80 flex items-start gap-2.5">
-            <AlertCircle className="w-4 h-4 text-rose-500 flex-shrink-0 mt-0.5" />
-            <div className="text-xs text-rose-900">
-              <p className="font-bold">Avisos bloqueados en Android</p>
-              <p className="text-[11px] text-rose-700 mt-1 leading-relaxed">
-                Chrome tiene bloqueadas las notificaciones para este enlace. Para habilitarlas:
-              </p>
-              <ol className="list-decimal ml-4 mt-1.5 space-y-1 text-[11px] text-rose-800 font-medium">
-                <li>Toca el ícono del <strong>candado o ajustes</strong> a la izquierda de la URL en Chrome.</li>
-                <li>Toca en <strong>Permisos</strong> ➔ activa <strong>Notificaciones</strong>.</li>
-                <li>Recarga la web.</li>
-              </ol>
-            </div>
-          </div>
-        )}
-
-        {isSupported && permissionStatus === 'default' && (
-          <div className="p-3 bg-gradient-to-r from-amber-50 to-orange-50 border-b border-amber-100/60 flex items-start gap-2.5">
-            <Sparkles className="w-4 h-4 text-amber-500 flex-shrink-0 mt-0.5" />
-            <div className="text-xs text-amber-900">
-              <p className="font-semibold">¿Activar avisos en pantalla?</p>
-              <p className="text-[11px] text-amber-700 mt-0.5">
-                Para que te lleguen avisos cuando Zahria o tú agreguen compromisos.
-              </p>
-              <button
-                type="button"
-                onClick={requestPermission}
-                className="mt-1.5 px-3 py-1 bg-amber-500 hover:bg-amber-600 text-white rounded-lg font-bold text-[11px] shadow-xs transition-colors active:scale-95"
-              >
-                Permitir avisos
-              </button>
-            </div>
-          </div>
-        )}
 
         {/* Notifications List */}
         <div className="divide-y divide-slate-100 overflow-y-auto flex-1 max-h-[350px]">
@@ -188,7 +158,7 @@ export const NotificationDrawer: React.FC<NotificationDrawerProps> = ({ isOpen, 
                     <button
                       type="button"
                       onClick={() => markAsRead(notif.id)}
-                      className="p-1 rounded-full text-slate-300 hover:text-emerald-600 hover:bg-emerald-50"
+                      className="p-1 rounded-full text-slate-300 hover:text-emerald-600 hover:bg-emerald-50 cursor-pointer"
                       title="Marcar como leída"
                     >
                       <Check className="w-3.5 h-3.5" />
@@ -200,11 +170,12 @@ export const NotificationDrawer: React.FC<NotificationDrawerProps> = ({ isOpen, 
           )}
         </div>
 
+        {/* Footer */}
         <div className="p-2.5 bg-slate-50 border-t border-slate-100 text-center">
           <button
             type="button"
             onClick={onClose}
-            className="text-xs font-semibold text-slate-500 hover:text-slate-700"
+            className="text-xs font-semibold text-slate-500 hover:text-slate-700 py-1 px-4 rounded-xl hover:bg-slate-100 cursor-pointer"
           >
             Cerrar
           </button>
