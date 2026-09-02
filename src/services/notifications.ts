@@ -53,11 +53,20 @@ class NotificationService {
   public async requestPermission(): Promise<NotificationPermission> {
     if (!this.isSupported()) return 'denied';
     try {
-      const permission = await Notification.requestPermission();
-      return permission;
-    } catch {
-      return 'denied';
+      if (typeof Notification.requestPermission === 'function') {
+        const res = Notification.requestPermission();
+        if (res && typeof res.then === 'function') {
+          return await res;
+        } else {
+          return await new Promise<NotificationPermission>((resolve) => {
+            Notification.requestPermission((p) => resolve(p));
+          });
+        }
+      }
+    } catch (err) {
+      console.warn('requestPermission error:', err);
     }
+    return Notification.permission;
   }
 
   /**

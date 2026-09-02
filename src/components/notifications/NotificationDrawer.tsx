@@ -1,7 +1,7 @@
 import React from 'react';
 import { createPortal } from 'react-dom';
 import { useNotification } from '../../context/NotificationContext';
-import { Bell, Check, Trash2, BellRing, Sparkles } from 'lucide-react';
+import { Bell, Check, Trash2, BellRing, Sparkles, AlertCircle } from 'lucide-react';
 import { formatDistanceToNow, parseISO } from 'date-fns';
 import { es } from 'date-fns/locale';
 
@@ -65,7 +65,24 @@ export const NotificationDrawer: React.FC<NotificationDrawerProps> = ({ isOpen, 
         </div>
 
         {/* Permission banner if needed */}
-        {isSupported && permissionStatus !== 'granted' && (
+        {isSupported && permissionStatus === 'denied' && (
+          <div className="p-3.5 bg-rose-50 border-b border-rose-100/80 flex items-start gap-2.5">
+            <AlertCircle className="w-4 h-4 text-rose-500 flex-shrink-0 mt-0.5" />
+            <div className="text-xs text-rose-900">
+              <p className="font-bold">Avisos bloqueados en Android</p>
+              <p className="text-[11px] text-rose-700 mt-1 leading-relaxed">
+                Chrome tiene bloqueadas las notificaciones para este enlace. Para habilitarlas:
+              </p>
+              <ol className="list-decimal ml-4 mt-1.5 space-y-1 text-[11px] text-rose-800 font-medium">
+                <li>Toca el ícono del <strong>candado o ajustes</strong> a la izquierda de la URL en Chrome.</li>
+                <li>Toca en <strong>Permisos</strong> ➔ activa <strong>Notificaciones</strong>.</li>
+                <li>Recarga la web.</li>
+              </ol>
+            </div>
+          </div>
+        )}
+
+        {isSupported && permissionStatus === 'default' && (
           <div className="p-3 bg-gradient-to-r from-amber-50 to-orange-50 border-b border-amber-100/60 flex items-start gap-2.5">
             <Sparkles className="w-4 h-4 text-amber-500 flex-shrink-0 mt-0.5" />
             <div className="text-xs text-amber-900">
@@ -76,7 +93,7 @@ export const NotificationDrawer: React.FC<NotificationDrawerProps> = ({ isOpen, 
               <button
                 type="button"
                 onClick={requestPermission}
-                className="mt-1.5 px-2.5 py-1 bg-amber-500 hover:bg-amber-600 text-white rounded-lg font-bold text-[10px] transition-colors"
+                className="mt-1.5 px-3 py-1 bg-amber-500 hover:bg-amber-600 text-white rounded-lg font-bold text-[11px] shadow-xs transition-colors active:scale-95"
               >
                 Permitir avisos
               </button>
