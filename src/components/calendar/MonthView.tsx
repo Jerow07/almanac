@@ -41,9 +41,9 @@ export const MonthView: React.FC = () => {
   };
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 w-full max-w-full overflow-hidden">
       {/* Month Calendar Card */}
-      <div className="bg-white rounded-3xl shadow-sm border border-slate-100 overflow-hidden">
+      <div className="bg-white rounded-3xl shadow-sm border border-slate-100 overflow-hidden w-full max-w-full">
         {/* Weekday Header */}
         <div className="grid grid-cols-7 border-b border-slate-100 bg-slate-50/70 text-center py-2.5">
           {DAYS_OF_WEEK.map((day) => (

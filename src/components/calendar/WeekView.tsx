@@ -19,7 +19,7 @@ export const WeekView: React.FC = () => {
   }, [filteredTasks]);
 
   return (
-    <div className="bg-white rounded-3xl shadow-sm border border-slate-100 overflow-hidden">
+    <div className="bg-white rounded-3xl shadow-sm border border-slate-100 overflow-hidden w-full max-w-full">
       <div className="grid grid-cols-1 md:grid-cols-7 divide-y md:divide-y-0 md:divide-x divide-slate-100 min-h-[600px]">
         {weekDays.map((day, idx) => {
           const dateKey = formatDateKey(day);

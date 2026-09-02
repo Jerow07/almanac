@@ -15,7 +15,7 @@ const CalendarContent: React.FC = () => {
   const { view, isCloudModalOpen, closeCloudModal } = useCalendar();
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#FAF8F5] text-slate-800">
+    <div className="min-h-screen flex flex-col bg-[#FAF8F5] text-slate-800 overflow-x-hidden w-full max-w-full">
       <Header />
       <FilterBar />
 

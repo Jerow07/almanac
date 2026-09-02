@@ -19,11 +19,11 @@ export const FilterBar: React.FC = () => {
   const completedCount = filteredTasks.filter((t) => t.completed).length;
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 pt-4 pb-2 space-y-3">
+    <div className="max-w-7xl w-full mx-auto px-3 sm:px-6 pt-3 pb-2 space-y-2.5 overflow-hidden">
       {/* Upper row: Couple filter + Search box */}
-      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5">
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5 w-full">
         {/* Person Selector Tabs */}
-        <div className="flex items-center gap-1.5 overflow-x-auto pb-1 sm:pb-0 scrollbar-none">
+        <div className="flex items-center gap-1.5 overflow-x-auto pb-1 sm:pb-0 scrollbar-none w-full max-w-full">
           <span className="text-xs font-semibold text-slate-400 flex items-center gap-1 mr-1 hidden sm:inline-flex">
             <Filter className="w-3.5 h-3.5" />
             Ver:
@@ -108,8 +108,8 @@ export const FilterBar: React.FC = () => {
       </div>
 
       {/* Lower row: Category filters */}
-      <div className="flex items-center justify-between gap-2 overflow-x-auto pb-1 scrollbar-none text-xs">
-        <div className="flex items-center gap-1.5">
+      <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none text-xs w-full max-w-full">
+        <div className="flex items-center gap-1.5 flex-nowrap">
           <button
             type="button"
             onClick={() => setCategoryFilter('all')}
