@@ -1,0 +1,17 @@
+name: Almanac Background Reminders
+
+on:
+  schedule:
+    # Runs every 10 minutes (UTC) to check and send task reminders
+    - cron: '*/10 * * * *'
+  workflow_dispatch:
+
+jobs:
+  check-reminders:
+    name: Check and Send Due Reminders
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping Almanac Reminders Endpoint
+        run: |
+          echo "Pinging Almanac check-reminders endpoint..."
+          curl -s -X GET "https://almanac-six.vercel.app/api/check-reminders" | grep -v '^$' || true

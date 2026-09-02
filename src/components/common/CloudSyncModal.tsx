@@ -59,6 +59,20 @@ CREATE POLICY "Acceso total subscripciones push" ON almanac_push_subscriptions
   TO anon, authenticated
   USING (true)
   WITH CHECK (true);
+
+-- Tabla para registro de recordatorios enviados
+CREATE TABLE IF NOT EXISTS almanac_reminders_sent (
+  id TEXT PRIMARY KEY,
+  task_id TEXT,
+  reminded_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+ALTER TABLE almanac_reminders_sent ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Acceso total reminders sent" ON almanac_reminders_sent
+  FOR ALL
+  TO anon, authenticated
+  USING (true)
+  WITH CHECK (true);
 `;
 
 export const CloudSyncModal: React.FC<CloudSyncModalProps> = ({ isOpen, onClose }) => {
