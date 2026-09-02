@@ -114,6 +114,14 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
           ].slice(0, 25));
         }
       } else if (type === 'complete') {
+        const completer = task.completedBy;
+
+        // If completed by ourselves, NEVER show notification to ourselves!
+        if (completer && completer === currentUser) {
+          return;
+        }
+
+        const partnerName = completer === 'zahria' ? 'Zahria' : 'Jerónimo';
         const title = `¡${partnerName} completó una tarea! 🎉`;
         const message = `"${task.title}"`;
 

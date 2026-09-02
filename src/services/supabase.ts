@@ -71,6 +71,20 @@ export const mapDbToTask = (row: any): Task => {
     else if (row.id.startsWith('task_jeronimo_')) createdBy = 'jeronimo';
   }
 
+  let completedAt: string | undefined = undefined;
+  let completedBy: 'jeronimo' | 'zahria' | undefined = undefined;
+  if (row.completed_at) {
+    if (typeof row.completed_at === 'string' && row.completed_at.includes('_by_')) {
+      const [datePart, byPart] = row.completed_at.split('_by_');
+      completedAt = datePart;
+      if (byPart === 'jeronimo' || byPart === 'zahria') {
+        completedBy = byPart;
+      }
+    } else {
+      completedAt = row.completed_at;
+    }
+  }
+
   return {
     id: row.id,
     title: row.title,
@@ -82,7 +96,8 @@ export const mapDbToTask = (row: any): Task => {
     category: row.category,
     priority: row.priority,
     completed: Boolean(row.completed),
-    completedAt: row.completed_at || undefined,
+    completedAt,
+    completedBy,
     recurrence: row.recurrence || 'none',
     reminder: row.reminder || 'none',
     createdBy,
@@ -91,23 +106,31 @@ export const mapDbToTask = (row: any): Task => {
   };
 };
 
-export const mapTaskToDb = (task: Task) => ({
-  id: task.id,
-  title: task.title,
-  description: task.description || null,
-  date: task.date,
-  time: task.time || null,
-  all_day: task.allDay,
-  assignee: task.assignee,
-  category: task.category,
-  priority: task.priority,
-  completed: task.completed,
-  completed_at: task.completedAt || null,
-  recurrence: task.recurrence,
-  reminder: task.reminder,
-  created_at: task.createdAt,
-  updated_at: task.updatedAt,
-});
+export const mapTaskToDb = (task: Task) => {
+  let completedAtValue: string | null = null;
+  if (task.completed) {
+    const isoDate = task.completedAt || new Date().toISOString();
+    completedAtValue = task.completedBy ? `${isoDate}_by_${task.completedBy}` : isoDate;
+  }
+
+  return {
+    id: task.id,
+    title: task.title,
+    description: task.description || null,
+    date: task.date,
+    time: task.time || null,
+    all_day: task.allDay,
+    assignee: task.assignee,
+    category: task.category,
+    priority: task.priority,
+    completed: task.completed,
+    completed_at: completedAtValue,
+    recurrence: task.recurrence,
+    reminder: task.reminder,
+    created_at: task.createdAt,
+    updated_at: task.updatedAt,
+  };
+};
 
 export const supabaseSync = {
   /**

@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, useMemo, useCallback } from 'react';
+import React, { createContext, useContext, useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { Task, Assignee, CalendarViewType, TaskCategory, Partner } from '../types';
 import { storageService } from '../services/storage';
 import { sounds } from '../utils/sound';
@@ -80,6 +80,9 @@ export const CalendarProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     return saved === 'zahria' ? 'zahria' : 'jeronimo';
   });
 
+  // Track tasks completed on this local device to prevent echoing notifications to ourselves
+  const locallyCompletedTaskIds = useRef<Set<string>>(new Set());
+
   const setCurrentUser = (user: Partner) => {
     setCurrentUserState(user);
     localStorage.setItem('almanac_current_user', user);
@@ -139,11 +142,16 @@ export const CalendarProvider: React.FC<{ children: React.ReactNode }> = ({ chil
             setTasks((prev) => prev.map((t) => (t.id === updated.id ? updated : t)));
 
             if (payload.new.completed && !(payload.old as any)?.completed) {
-              window.dispatchEvent(
-                new CustomEvent('almanac:partner-action', {
-                  detail: { type: 'complete', task: updated }
-                })
-              );
+              // Only dispatch partner complete event if completed by the other person (not locally by ourselves)
+              if (locallyCompletedTaskIds.current.has(updated.id)) {
+                locallyCompletedTaskIds.current.delete(updated.id);
+              } else {
+                window.dispatchEvent(
+                  new CustomEvent('almanac:partner-action', {
+                    detail: { type: 'complete', task: updated }
+                  })
+                );
+              }
             }
           } else if (payload.eventType === 'DELETE') {
             const deletedId = payload.old.id;
@@ -242,13 +250,16 @@ export const CalendarProvider: React.FC<{ children: React.ReactNode }> = ({ chil
           if (isNowCompleted) {
             sounds.playSuccessChime();
             triggerConfetti();
+            locallyCompletedTaskIds.current.add(id);
           } else {
             sounds.playClick();
+            locallyCompletedTaskIds.current.delete(id);
           }
           targetTask = {
             ...t,
             completed: isNowCompleted,
             completedAt: isNowCompleted ? new Date().toISOString() : undefined,
+            completedBy: isNowCompleted ? currentUser : undefined,
             updatedAt: new Date().toISOString(),
           };
           return targetTask;

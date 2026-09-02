@@ -30,6 +30,7 @@ export interface Task {
   priority: Priority;
   completed: boolean;
   completedAt?: string;
+  completedBy?: Partner;
   recurrence: RecurrenceType;
   reminder: ReminderOffset;
   createdBy?: Partner;
