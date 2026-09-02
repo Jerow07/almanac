@@ -122,44 +122,44 @@ export const CloudSyncModal: React.FC<CloudSyncModalProps> = ({ isOpen, onClose 
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm animate-in fade-in">
-      <div className="relative w-full max-w-lg bg-white rounded-3xl shadow-2xl overflow-hidden border border-purple-100 flex flex-col max-h-[90vh]">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-in fade-in">
+      <div className="relative w-full max-w-lg bg-white dark:bg-slate-900 rounded-3xl shadow-2xl overflow-hidden border border-purple-100 dark:border-slate-800 flex flex-col max-h-[90vh] transition-colors">
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 bg-gradient-to-r from-purple-50 via-pink-50 to-blue-50 border-b border-purple-100">
+        <div className="flex items-center justify-between px-6 py-4 bg-gradient-to-r from-purple-50 via-pink-50 to-blue-50 dark:from-slate-850 dark:via-purple-950/40 dark:to-slate-850 border-b border-purple-100 dark:border-slate-800">
           <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-full bg-purple-100 text-purple-600 flex items-center justify-center">
+            <div className="w-8 h-8 rounded-full bg-purple-100 dark:bg-purple-950/60 text-purple-600 dark:text-purple-400 flex items-center justify-center">
               <Cloud className="w-4 h-4" />
             </div>
             <div>
-              <h3 className="font-bold text-slate-800 text-base">Sincronización en la Nube</h3>
-              <p className="text-xs text-slate-500">Para que Jerónimo y Zahria vean los cambios en vivo</p>
+              <h3 className="font-bold text-slate-800 dark:text-slate-100 text-base">Sincronización en la Nube</h3>
+              <p className="text-xs text-slate-500 dark:text-slate-400">Para que Jerónimo y Zahria vean los cambios en vivo</p>
             </div>
           </div>
           <button
             type="button"
             onClick={onClose}
-            className="p-1.5 rounded-full text-slate-400 hover:text-slate-600 hover:bg-white"
+            className="p-1.5 rounded-full text-slate-400 hover:text-slate-600 dark:text-slate-500 dark:hover:text-slate-300 hover:bg-white dark:hover:bg-slate-800 transition-all cursor-pointer"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
         {/* Content */}
-        <div className="p-6 overflow-y-auto space-y-4 text-xs text-slate-600">
+        <div className="p-6 overflow-y-auto space-y-4 text-xs text-slate-600 dark:text-slate-300">
           {/* Status banner */}
           <div
             className={`p-3.5 rounded-2xl flex items-center gap-3 border ${
               isConnected
-                ? 'bg-emerald-50 border-emerald-200 text-emerald-900'
-                : 'bg-amber-50 border-amber-200 text-amber-900'
+                ? 'bg-emerald-50 dark:bg-emerald-950/40 border-emerald-200 dark:border-emerald-800 text-emerald-900 dark:text-emerald-200'
+                : 'bg-amber-50 dark:bg-amber-950/40 border-amber-200 dark:border-amber-800 text-amber-900 dark:text-amber-200'
             }`}
           >
             {isConnected ? (
               <>
-                <Cloud className="w-6 h-6 text-emerald-500 flex-shrink-0 fill-emerald-100" />
+                <Cloud className="w-6 h-6 text-emerald-500 dark:text-emerald-400 flex-shrink-0 fill-emerald-100 dark:fill-emerald-950/60" />
                 <div>
                   <p className="font-bold">¡Conectado a la Nube! 🌐</p>
-                  <p className="text-[11px] text-emerald-700 mt-0.5">
+                  <p className="text-[11px] text-emerald-700 dark:text-emerald-300 mt-0.5">
                     Tú y Zahria pueden agregar y completar tareas desde cualquier celular o PC y se actualizan al instante.
                   </p>
                 </div>
@@ -169,7 +169,7 @@ export const CloudSyncModal: React.FC<CloudSyncModalProps> = ({ isOpen, onClose 
                 <CloudOff className="w-6 h-6 text-amber-500 flex-shrink-0" />
                 <div>
                   <p className="font-bold">Modo Local (Sin sincronizar)</p>
-                  <p className="text-[11px] text-amber-700 mt-0.5">
+                  <p className="text-[11px] text-amber-700 dark:text-amber-300 mt-0.5">
                     Actualmente las tareas se guardan solo en la memoria de este navegador. Conecta Supabase (gratis) para sincronizar entre sus dos celulares.
                   </p>
                 </div>
@@ -181,10 +181,10 @@ export const CloudSyncModal: React.FC<CloudSyncModalProps> = ({ isOpen, onClose 
             <div
               className={`p-3 rounded-xl font-medium text-xs ${
                 statusMessage.type === 'success'
-                  ? 'bg-emerald-100 text-emerald-800'
+                  ? 'bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300'
                   : statusMessage.type === 'error'
-                  ? 'bg-rose-100 text-rose-800'
-                  : 'bg-blue-100 text-blue-800'
+                  ? 'bg-rose-100 dark:bg-rose-950/60 text-rose-800 dark:text-rose-300'
+                  : 'bg-blue-100 dark:bg-blue-950/60 text-blue-800 dark:text-blue-300'
               }`}
             >
               {statusMessage.text}
@@ -192,16 +192,16 @@ export const CloudSyncModal: React.FC<CloudSyncModalProps> = ({ isOpen, onClose 
           )}
 
           {/* Setup guide */}
-          <div className="space-y-2 bg-slate-50 p-3.5 rounded-2xl border border-slate-100">
-            <p className="font-bold text-slate-800">¿Cómo conectar la nube gratis en 2 minutos?</p>
-            <ol className="list-decimal list-inside space-y-1 text-slate-600">
+          <div className="space-y-2 bg-slate-50 dark:bg-slate-850 p-3.5 rounded-2xl border border-slate-100 dark:border-slate-800">
+            <p className="font-bold text-slate-800 dark:text-slate-100">¿Cómo conectar la nube gratis en 2 minutos?</p>
+            <ol className="list-decimal list-inside space-y-1 text-slate-600 dark:text-slate-300">
               <li>
                 Crea una cuenta gratuita en{' '}
                 <a
                   href="https://supabase.com"
                   target="_blank"
                   rel="noreferrer"
-                  className="text-purple-600 font-bold underline inline-flex items-center gap-0.5"
+                  className="text-purple-600 dark:text-purple-400 font-bold underline inline-flex items-center gap-0.5"
                 >
                   supabase.com <ExternalLink className="w-2.5 h-2.5" />
                 </a>{' '}
@@ -218,22 +218,22 @@ export const CloudSyncModal: React.FC<CloudSyncModalProps> = ({ isOpen, onClose 
               <button
                 type="button"
                 onClick={handleCopySql}
-                className="absolute top-2 right-2 px-2 py-1 bg-white/20 hover:bg-white/30 text-white rounded-md text-[10px] flex items-center gap-1 font-sans transition-all"
+                className="absolute top-2 right-2 px-2 py-1 bg-white/20 hover:bg-white/30 text-white rounded-md text-[10px] flex items-center gap-1 font-sans transition-all cursor-pointer"
               >
                 {copied ? <Check className="w-3 h-3 text-emerald-400" /> : <Copy className="w-3 h-3" />}
                 {copied ? '¡Copiado!' : 'Copiar SQL'}
               </button>
             </div>
 
-              <p className="text-[11px] text-slate-500">
-                3. Ve a <strong>Project Settings ➔ API</strong> y copia la <strong>URL</strong> y la clave <strong>anon key</strong> aquí abajo:
-              </p>
+            <p className="text-[11px] text-slate-500 dark:text-slate-400">
+              3. Ve a <strong>Project Settings ➔ API</strong> y copia la <strong>URL</strong> y la clave <strong>anon key</strong> aquí abajo:
+            </p>
           </div>
 
           {/* Form */}
           <form onSubmit={handleSave} className="space-y-3 pt-1">
             <div>
-              <label className="block font-bold text-slate-700 mb-1 uppercase tracking-wider text-[10px]">
+              <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1 uppercase tracking-wider text-[10px]">
                 Project URL
               </label>
               <input
@@ -242,12 +242,12 @@ export const CloudSyncModal: React.FC<CloudSyncModalProps> = ({ isOpen, onClose 
                 placeholder="https://xxxxxxxxxxxx.supabase.co"
                 value={url}
                 onChange={(e) => setUrl(e.target.value)}
-                className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs focus:ring-2 focus:ring-purple-400 focus:outline-none"
+                className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 text-xs focus:ring-2 focus:ring-purple-400 focus:outline-none"
               />
             </div>
 
             <div>
-              <label className="block font-bold text-slate-700 mb-1 uppercase tracking-wider text-[10px]">
+              <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1 uppercase tracking-wider text-[10px]">
                 Anon Key (Clave Pública)
               </label>
               <input
@@ -256,7 +256,7 @@ export const CloudSyncModal: React.FC<CloudSyncModalProps> = ({ isOpen, onClose 
                 placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
                 value={anonKey}
                 onChange={(e) => setAnonKey(e.target.value)}
-                className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs focus:ring-2 focus:ring-purple-400 focus:outline-none"
+                className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 text-xs focus:ring-2 focus:ring-purple-400 focus:outline-none"
               />
             </div>
 
@@ -265,7 +265,7 @@ export const CloudSyncModal: React.FC<CloudSyncModalProps> = ({ isOpen, onClose 
                 <button
                   type="button"
                   onClick={handleDisconnect}
-                  className="text-rose-600 hover:text-rose-700 font-semibold"
+                  className="text-rose-600 dark:text-rose-400 hover:text-rose-700 dark:hover:text-rose-300 font-semibold cursor-pointer"
                 >
                   Desconectar
                 </button>
@@ -276,7 +276,7 @@ export const CloudSyncModal: React.FC<CloudSyncModalProps> = ({ isOpen, onClose 
               <button
                 type="submit"
                 disabled={isTesting}
-                className="px-4 py-2 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white rounded-xl font-bold shadow-md transition-all flex items-center gap-1.5"
+                className="px-4 py-2 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white rounded-xl font-bold shadow-md transition-all flex items-center gap-1.5 cursor-pointer"
               >
                 {isTesting && <RefreshCw className="w-3.5 h-3.5 animate-spin" />}
                 {isConnected ? 'Actualizar Conexión' : 'Conectar y Sincronizar'}

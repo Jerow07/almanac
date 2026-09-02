@@ -1,4 +1,5 @@
 import React from 'react';
+import { ThemeProvider } from './context/ThemeContext';
 import { CalendarProvider, useCalendar } from './context/CalendarContext';
 import { NotificationProvider } from './context/NotificationContext';
 import { Header } from './components/layout/Header';
@@ -15,7 +16,7 @@ const CalendarContent: React.FC = () => {
   const { view, isCloudModalOpen, closeCloudModal } = useCalendar();
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#FAF8F5] text-slate-800 overflow-x-hidden w-full max-w-full">
+    <div className="min-h-screen flex flex-col bg-[#FAF8F5] dark:bg-slate-950 text-slate-800 dark:text-slate-100 transition-colors duration-200 overflow-x-hidden w-full max-w-full">
       <Header />
       <FilterBar />
 
@@ -35,10 +36,12 @@ const CalendarContent: React.FC = () => {
 
 export default function App() {
   return (
-    <CalendarProvider>
-      <NotificationProvider>
-        <CalendarContent />
-      </NotificationProvider>
-    </CalendarProvider>
+    <ThemeProvider>
+      <CalendarProvider>
+        <NotificationProvider>
+          <CalendarContent />
+        </NotificationProvider>
+      </CalendarProvider>
+    </ThemeProvider>
   );
 }

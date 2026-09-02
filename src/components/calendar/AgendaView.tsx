@@ -58,17 +58,17 @@ export const AgendaView: React.FC = () => {
     <div className="max-w-4xl mx-auto space-y-6">
       {/* Empty State */}
       {totalActive === 0 && completed.length === 0 && (
-        <div className="bg-white rounded-3xl p-12 text-center border border-slate-100 shadow-sm">
+        <div className="bg-white dark:bg-slate-900 rounded-3xl p-12 text-center border border-slate-100 dark:border-slate-800 shadow-sm transition-colors">
           <CalendarHeart className="w-14 h-14 text-pink-400 mx-auto mb-3 stroke-1" />
-          <h3 className="text-base font-bold text-slate-800">¡Almanaque completamente al día!</h3>
-          <p className="text-xs text-slate-500 max-w-sm mx-auto mt-1">
+          <h3 className="text-base font-bold text-slate-800 dark:text-slate-100">¡Almanaque completamente al día!</h3>
+          <p className="text-xs text-slate-500 dark:text-slate-400 max-w-sm mx-auto mt-1">
             No tienen tareas pendientes registradas con los filtros actuales. ¿Tienen algún nuevo
             plan juntos?
           </p>
           <button
             type="button"
             onClick={() => openNewTaskModal()}
-            className="mt-4 inline-flex items-center gap-2 px-5 py-2.5 rounded-2xl bg-gradient-to-r from-pink-500 to-rose-500 text-white text-xs font-bold shadow-md hover:shadow-lg transition-all"
+            className="mt-4 inline-flex items-center gap-2 px-5 py-2.5 rounded-2xl bg-gradient-to-r from-pink-500 to-rose-500 text-white text-xs font-bold shadow-md hover:shadow-lg transition-all cursor-pointer"
           >
             <Plus className="w-4 h-4" />
             Crear nueva tarea o cita
@@ -81,7 +81,7 @@ export const AgendaView: React.FC = () => {
         <section className="space-y-3">
           <div className="flex items-center gap-2">
             <span className="w-2.5 h-2.5 rounded-full bg-rose-500 animate-ping" />
-            <h3 className="text-xs font-extrabold uppercase tracking-wider text-rose-600">
+            <h3 className="text-xs font-extrabold uppercase tracking-wider text-rose-600 dark:text-rose-400">
               Atrasadas ({overdue.length})
             </h3>
           </div>
@@ -99,11 +99,11 @@ export const AgendaView: React.FC = () => {
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <span className="text-lg">🌟</span>
-              <h3 className="text-xs font-extrabold uppercase tracking-wider text-slate-800">
+              <h3 className="text-xs font-extrabold uppercase tracking-wider text-slate-800 dark:text-slate-100">
                 Para Hoy ({today.length})
               </h3>
             </div>
-            <span className="text-xs text-slate-400">{formatFriendlyDate(new Date().toISOString().split('T')[0])}</span>
+            <span className="text-xs text-slate-400 dark:text-slate-500">{formatFriendlyDate(new Date().toISOString().split('T')[0])}</span>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             {today.map((task) => (
@@ -118,7 +118,7 @@ export const AgendaView: React.FC = () => {
         <section className="space-y-3">
           <div className="flex items-center gap-2">
             <span className="text-lg">🌿</span>
-            <h3 className="text-xs font-extrabold uppercase tracking-wider text-slate-700">
+            <h3 className="text-xs font-extrabold uppercase tracking-wider text-slate-700 dark:text-slate-300">
               Mañana ({tomorrow.length})
             </h3>
           </div>
@@ -135,7 +135,7 @@ export const AgendaView: React.FC = () => {
         <section className="space-y-3">
           <div className="flex items-center gap-2">
             <span className="text-lg">📅</span>
-            <h3 className="text-xs font-extrabold uppercase tracking-wider text-slate-700">
+            <h3 className="text-xs font-extrabold uppercase tracking-wider text-slate-700 dark:text-slate-300">
               Próximos días ({upcoming.length})
             </h3>
           </div>
@@ -149,10 +149,10 @@ export const AgendaView: React.FC = () => {
 
       {/* Completed */}
       {completed.length > 0 && (
-        <section className="space-y-3 pt-4 border-t border-slate-200">
+        <section className="space-y-3 pt-4 border-t border-slate-200 dark:border-slate-800">
           <div className="flex items-center gap-2">
             <CheckCircle2 className="w-4 h-4 text-emerald-500" />
-            <h3 className="text-xs font-extrabold uppercase tracking-wider text-slate-500">
+            <h3 className="text-xs font-extrabold uppercase tracking-wider text-slate-500 dark:text-slate-400">
               ¡Completadas con éxito! ({completed.length})
             </h3>
           </div>

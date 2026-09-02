@@ -32,20 +32,20 @@ export const NotificationDrawer: React.FC<NotificationDrawerProps> = ({ isOpen, 
     <>
       {/* Full-screen Backdrop (closes modal on tap) */}
       <div
-        className="fixed inset-0 bg-slate-900/40 backdrop-blur-xs z-[9998]"
+        className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-[9998]"
         onClick={onClose}
       />
 
       {/* Floating Notification Card (Always on top of everything) */}
       <div
         onClick={(e) => e.stopPropagation()}
-        className="fixed inset-x-3 sm:inset-x-auto sm:right-6 top-16 w-auto sm:w-96 bg-white rounded-3xl shadow-2xl border border-pink-100 z-[9999] overflow-hidden animate-in fade-in zoom-in-95 duration-150 max-h-[85vh] flex flex-col"
+        className="fixed inset-x-3 sm:inset-x-auto sm:right-6 top-16 w-auto sm:w-96 bg-white dark:bg-slate-900 rounded-3xl shadow-2xl border border-pink-100 dark:border-slate-800 z-[9999] overflow-hidden animate-in fade-in zoom-in-95 duration-150 max-h-[85vh] flex flex-col transition-colors"
       >
         {/* Header */}
-        <div className="flex items-center justify-between px-4 py-3 bg-gradient-to-r from-pink-50 to-purple-50 border-b border-pink-100/60">
+        <div className="flex items-center justify-between px-4 py-3 bg-gradient-to-r from-pink-50 to-purple-50 dark:from-slate-800 dark:to-slate-800 border-b border-pink-100/60 dark:border-slate-800">
           <div className="flex items-center gap-2">
             <BellRing className="w-4 h-4 text-pink-500" />
-            <h4 className="font-bold text-xs text-slate-800 uppercase tracking-wider">
+            <h4 className="font-bold text-xs text-slate-800 dark:text-slate-100 uppercase tracking-wider">
               Avisos & Recordatorios
             </h4>
           </div>
@@ -54,19 +54,19 @@ export const NotificationDrawer: React.FC<NotificationDrawerProps> = ({ isOpen, 
               <button
                 type="button"
                 onClick={markAllAsRead}
-                className="text-pink-600 hover:text-pink-700 font-medium cursor-pointer"
+                className="text-pink-600 dark:text-pink-400 hover:text-pink-700 dark:hover:text-pink-300 font-medium cursor-pointer"
                 title="Marcar todas como leídas"
               >
                 Leídas
               </button>
-              <span className="text-slate-300">|</span>
+              <span className="text-slate-300 dark:text-slate-600">|</span>
               <button
                 type="button"
                 onClick={() => {
                   clearNotifications();
                   sounds.playPop();
                 }}
-                className="text-slate-400 hover:text-rose-500 font-medium flex items-center gap-1 cursor-pointer"
+                className="text-slate-400 dark:text-slate-500 hover:text-rose-500 dark:hover:text-rose-400 font-medium flex items-center gap-1 cursor-pointer"
                 title="Limpiar todos los avisos"
               >
                 <Trash2 className="w-3.5 h-3.5" />
@@ -77,22 +77,22 @@ export const NotificationDrawer: React.FC<NotificationDrawerProps> = ({ isOpen, 
         </div>
 
         {/* Master In-App Notifications Switch */}
-        <div className="flex items-center justify-between px-4 py-3 bg-slate-50/90 border-b border-slate-100 text-xs">
+        <div className="flex items-center justify-between px-4 py-3 bg-slate-50/90 dark:bg-slate-850 border-b border-slate-100 dark:border-slate-800 text-xs">
           <div className="flex items-center gap-2.5">
             {notificationsEnabled ? (
-              <div className="w-8 h-8 rounded-xl bg-pink-100 text-pink-600 flex items-center justify-center flex-shrink-0">
+              <div className="w-8 h-8 rounded-xl bg-pink-100 dark:bg-pink-950/60 text-pink-600 dark:text-pink-400 flex items-center justify-center flex-shrink-0">
                 <Bell className="w-4 h-4" />
               </div>
             ) : (
-              <div className="w-8 h-8 rounded-xl bg-slate-200 text-slate-500 flex items-center justify-center flex-shrink-0">
+              <div className="w-8 h-8 rounded-xl bg-slate-200 dark:bg-slate-800 text-slate-500 dark:text-slate-400 flex items-center justify-center flex-shrink-0">
                 <BellOff className="w-4 h-4" />
               </div>
             )}
             <div>
-              <p className="font-bold text-slate-800 text-xs">
+              <p className="font-bold text-slate-800 dark:text-slate-100 text-xs">
                 {notificationsEnabled ? 'Avisos: Activos' : 'Avisos: En Pausa'}
               </p>
-              <p className="text-[11px] text-slate-500">
+              <p className="text-[11px] text-slate-500 dark:text-slate-400">
                 {notificationsEnabled
                   ? 'Recibes alertas de planes y tareas'
                   : 'Silenciados dentro de Almanac'}
@@ -108,7 +108,7 @@ export const NotificationDrawer: React.FC<NotificationDrawerProps> = ({ isOpen, 
               toggleNotificationsEnabled();
             }}
             className={`w-12 h-6 flex items-center rounded-full p-0.5 transition-colors cursor-pointer flex-shrink-0 ${
-              notificationsEnabled ? 'bg-pink-500' : 'bg-slate-300'
+              notificationsEnabled ? 'bg-pink-500' : 'bg-slate-300 dark:bg-slate-700'
             }`}
             title={notificationsEnabled ? 'Pausar avisos' : 'Activar avisos'}
           >
@@ -122,10 +122,10 @@ export const NotificationDrawer: React.FC<NotificationDrawerProps> = ({ isOpen, 
 
         {/* Permission Prompt for Android if not yet granted */}
         {isSupported && permissionStatus === 'default' && (
-          <div className="p-3 bg-pink-50/80 border-b border-pink-100 flex items-center justify-between gap-2 text-xs">
+          <div className="p-3 bg-pink-50/80 dark:bg-pink-950/40 border-b border-pink-100 dark:border-pink-900/50 flex items-center justify-between gap-2 text-xs">
             <div>
-              <p className="font-bold text-pink-900">🔔 Activar avisos en Android</p>
-              <p className="text-[11px] text-pink-700">Toca aquí para autorizar alertas</p>
+              <p className="font-bold text-pink-900 dark:text-pink-200">🔔 Activar avisos en Android</p>
+              <p className="text-[11px] text-pink-700 dark:text-pink-300">Toca aquí para autorizar alertas</p>
             </div>
             <button
               type="button"
@@ -139,22 +139,22 @@ export const NotificationDrawer: React.FC<NotificationDrawerProps> = ({ isOpen, 
 
         {/* Permission Denied Guide for Android */}
         {isSupported && permissionStatus === 'denied' && (
-          <div className="p-3 bg-rose-50 border-b border-rose-100 text-xs">
-            <p className="font-bold text-rose-800 flex items-center gap-1">
+          <div className="p-3 bg-rose-50 dark:bg-rose-950/40 border-b border-rose-100 dark:border-rose-900/50 text-xs">
+            <p className="font-bold text-rose-800 dark:text-rose-200 flex items-center gap-1">
               <span>⚠️</span>
               <span>Notificaciones bloqueadas en Android</span>
             </p>
-            <p className="text-[11px] text-rose-700 mt-1 leading-relaxed">
+            <p className="text-[11px] text-rose-700 dark:text-rose-300 mt-1 leading-relaxed">
               Tu teléfono tiene las notificaciones desactivadas para Almanac. Para recibirlas: mantén presionado el ícono de <strong>Almanac</strong> en el celular ➔ <strong>Info de la app (ⓘ)</strong> ➔ <strong>Notificaciones</strong> ➔ <strong>Permitir</strong>.
             </p>
           </div>
         )}
 
         {/* Notifications List */}
-        <div className="divide-y divide-slate-100 overflow-y-auto flex-1 max-h-[320px]">
+        <div className="divide-y divide-slate-100 dark:divide-slate-800 overflow-y-auto flex-1 max-h-[320px]">
           {notifications.length === 0 ? (
-            <div className="p-8 text-center text-slate-400">
-              <Bell className="w-8 h-8 mx-auto mb-2 text-slate-300 opacity-60" />
+            <div className="p-8 text-center text-slate-400 dark:text-slate-500">
+              <Bell className="w-8 h-8 mx-auto mb-2 text-slate-300 dark:text-slate-600 opacity-60" />
               <p className="text-xs font-semibold">No hay avisos pendientes</p>
               <p className="text-[11px] mt-0.5">¡Están al día con todos los planes!</p>
             </div>
@@ -174,7 +174,7 @@ export const NotificationDrawer: React.FC<NotificationDrawerProps> = ({ isOpen, 
                 <div
                   key={notif.id}
                   className={`p-3 transition-colors flex items-start justify-between gap-2.5 ${
-                    notif.read ? 'bg-white opacity-70' : 'bg-pink-50/20'
+                    notif.read ? 'bg-white dark:bg-slate-900 opacity-70' : 'bg-pink-50/20 dark:bg-pink-950/20'
                   }`}
                 >
                   <div className="flex-1 min-w-0">
@@ -182,14 +182,14 @@ export const NotificationDrawer: React.FC<NotificationDrawerProps> = ({ isOpen, 
                       {!notif.read && (
                         <span className="w-1.5 h-1.5 rounded-full bg-pink-500 flex-shrink-0" />
                       )}
-                      <h5 className="font-bold text-xs text-slate-800 truncate">
+                      <h5 className="font-bold text-xs text-slate-800 dark:text-slate-100 truncate">
                         {notif.title}
                       </h5>
                     </div>
-                    <p className="text-[11px] text-slate-600 mt-0.5">
+                    <p className="text-[11px] text-slate-600 dark:text-slate-300 mt-0.5">
                       {notif.message}
                     </p>
-                    <span className="text-[10px] text-slate-400 mt-1 block">
+                    <span className="text-[10px] text-slate-400 dark:text-slate-500 mt-1 block">
                       {timeFormatted}
                     </span>
                   </div>
@@ -199,7 +199,7 @@ export const NotificationDrawer: React.FC<NotificationDrawerProps> = ({ isOpen, 
                       <button
                         type="button"
                         onClick={() => markAsRead(notif.id)}
-                        className="p-1 rounded-full text-slate-300 hover:text-emerald-600 hover:bg-emerald-50 cursor-pointer"
+                        className="p-1 rounded-full text-slate-300 dark:text-slate-600 hover:text-emerald-600 dark:hover:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-slate-800 cursor-pointer"
                         title="Marcar como leída"
                       >
                         <Check className="w-3.5 h-3.5" />
@@ -211,7 +211,7 @@ export const NotificationDrawer: React.FC<NotificationDrawerProps> = ({ isOpen, 
                         deleteNotification(notif.id);
                         sounds.playClick();
                       }}
-                      className="p-1 rounded-full text-slate-300 hover:text-rose-500 hover:bg-rose-50 cursor-pointer"
+                      className="p-1 rounded-full text-slate-300 dark:text-slate-600 hover:text-rose-500 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-slate-800 cursor-pointer"
                       title="Eliminar este aviso"
                     >
                       <Trash2 className="w-3.5 h-3.5" />
@@ -224,7 +224,7 @@ export const NotificationDrawer: React.FC<NotificationDrawerProps> = ({ isOpen, 
         </div>
 
         {/* Footer with Test Button */}
-        <div className="p-2.5 bg-slate-50 border-t border-slate-100 flex items-center justify-between px-4">
+        <div className="p-2.5 bg-slate-50 dark:bg-slate-850 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between px-4">
           <button
             type="button"
             onClick={() => {
@@ -233,7 +233,7 @@ export const NotificationDrawer: React.FC<NotificationDrawerProps> = ({ isOpen, 
               });
               sounds.playNotification();
             }}
-            className="text-xs font-bold text-pink-600 hover:text-pink-700 cursor-pointer flex items-center gap-1 py-1 px-2 rounded-xl hover:bg-pink-50 transition-colors active:scale-95"
+            className="text-xs font-bold text-pink-600 dark:text-pink-400 hover:text-pink-700 dark:hover:text-pink-300 cursor-pointer flex items-center gap-1 py-1 px-2 rounded-xl hover:bg-pink-50 dark:hover:bg-pink-950/40 transition-colors active:scale-95"
             title="Enviar una notificación de prueba ahora"
           >
             <span>🔔</span>
@@ -243,7 +243,7 @@ export const NotificationDrawer: React.FC<NotificationDrawerProps> = ({ isOpen, 
           <button
             type="button"
             onClick={onClose}
-            className="text-xs font-semibold text-slate-500 hover:text-slate-700 py-1 px-3 rounded-xl hover:bg-slate-100 cursor-pointer"
+            className="text-xs font-semibold text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 py-1 px-3 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer"
           >
             Cerrar
           </button>

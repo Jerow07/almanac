@@ -3,7 +3,7 @@ import { Heart, Smartphone } from 'lucide-react';
 
 export const Footer: React.FC = () => {
   return (
-    <footer className="mt-12 py-8 border-t border-slate-200/60 bg-white/50 text-slate-500 text-xs">
+    <footer className="mt-12 py-8 border-t border-slate-200/60 dark:border-slate-800 bg-white/50 dark:bg-slate-900/50 text-slate-500 dark:text-slate-400 text-xs transition-colors">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-3 text-center sm:text-left">
         <div className="flex items-center gap-1.5 font-medium">
           <span>Almanac • Organizado con</span>
@@ -11,8 +11,8 @@ export const Footer: React.FC = () => {
           <span>por Jerónimo & Zahria</span>
         </div>
 
-        <div className="flex items-center gap-1.5 text-slate-400 bg-slate-100/70 px-3 py-1.5 rounded-full">
-          <Smartphone className="w-3.5 h-3.5 text-slate-500" />
+        <div className="flex items-center gap-1.5 text-slate-400 dark:text-slate-400 bg-slate-100/70 dark:bg-slate-800/80 px-3 py-1.5 rounded-full">
+          <Smartphone className="w-3.5 h-3.5 text-slate-500 dark:text-slate-400" />
           <span className="text-[11px]">
             Tip: Añade este sitio a la pantalla de inicio de tu celular para abrirlo como una App.
           </span>

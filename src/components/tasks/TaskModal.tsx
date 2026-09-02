@@ -127,40 +127,40 @@ export const TaskModal: React.FC = () => {
 
   return createPortal(
     <div
-      className="fixed inset-0 z-[9999] flex items-center justify-center p-3 sm:p-4 bg-slate-900/40 backdrop-blur-xs animate-in fade-in duration-150"
+      className="fixed inset-0 z-[9999] flex items-center justify-center p-3 sm:p-4 bg-slate-900/60 backdrop-blur-xs animate-in fade-in duration-150"
       onClick={closeTaskModal}
     >
       <div
-        className="relative w-full max-w-xl bg-white rounded-3xl shadow-2xl overflow-hidden border border-pink-100 flex flex-col max-h-[90vh]"
+        className="relative w-full max-w-xl bg-white dark:bg-slate-900 rounded-3xl shadow-2xl overflow-hidden border border-pink-100 dark:border-slate-800 flex flex-col max-h-[90vh] transition-colors"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 bg-gradient-to-r from-pink-50 via-purple-50 to-blue-50 border-b border-pink-100/60 flex-shrink-0">
+        <div className="flex items-center justify-between px-6 py-4 bg-gradient-to-r from-pink-50 via-purple-50 to-blue-50 dark:from-slate-800 dark:via-purple-950/40 dark:to-slate-800 border-b border-pink-100/60 dark:border-slate-800 flex-shrink-0">
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-full bg-white shadow-sm flex items-center justify-center text-pink-500">
+            <div className="w-8 h-8 rounded-full bg-white dark:bg-slate-800 shadow-sm flex items-center justify-center text-pink-500">
               <Heart className="w-4 h-4 fill-pink-500 text-pink-500" />
             </div>
             <div>
-              <h3 className="font-bold text-slate-800 text-base">
+              <h3 className="font-bold text-slate-800 dark:text-slate-100 text-base">
                 {editingTask ? 'Editar compromiso' : 'Nueva tarea o plan juntos'}
               </h3>
-              <p className="text-xs text-slate-500">Almanaque de Jerónimo & Zahria</p>
+              <p className="text-xs text-slate-500 dark:text-slate-400">Almanaque de Jerónimo & Zahria</p>
             </div>
           </div>
           <button
             type="button"
             onClick={closeTaskModal}
-            className="p-1.5 rounded-full text-slate-400 hover:text-slate-600 hover:bg-white/80 transition-all cursor-pointer"
+            className="p-1.5 rounded-full text-slate-400 hover:text-slate-600 dark:text-slate-500 dark:hover:text-slate-300 hover:bg-white/80 dark:hover:bg-slate-800 transition-all cursor-pointer"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
         {/* Scrollable form body */}
-        <form onSubmit={handleSubmit} className="p-5 sm:p-6 overflow-y-auto overflow-x-hidden space-y-4 text-slate-700 flex-1">
+        <form onSubmit={handleSubmit} className="p-5 sm:p-6 overflow-y-auto overflow-x-hidden space-y-4 text-slate-700 dark:text-slate-200 flex-1">
           {/* Title */}
           <div>
-            <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">
+            <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1">
               ¿Qué tenemos planeado? *
             </label>
             <input
@@ -169,14 +169,14 @@ export const TaskModal: React.FC = () => {
               placeholder="Ej. Comprar regalo, Turno médico, Paseo el finde..."
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              className="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-pink-400 focus:border-transparent text-sm transition-all"
+              className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-pink-400 focus:border-transparent text-sm transition-all"
               autoFocus
             />
           </div>
 
           {/* Assignee selection */}
           <div>
-            <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">
+            <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5">
               ¿Quién se encarga?
             </label>
             <div className="grid grid-cols-3 gap-2">
@@ -188,18 +188,18 @@ export const TaskModal: React.FC = () => {
                     key={person}
                     type="button"
                     onClick={() => setAssignee(person)}
-                    className={`flex flex-col items-center justify-center p-2.5 rounded-2xl border-2 transition-all ${
+                    className={`flex flex-col items-center justify-center p-2.5 rounded-2xl border-2 transition-all cursor-pointer ${
                       isSelected
                         ? person === 'jeronimo'
-                          ? 'border-blue-500 bg-blue-50/80 shadow-sm'
+                          ? 'border-blue-500 bg-blue-50/80 dark:bg-blue-950/60 shadow-sm'
                           : person === 'zahria'
-                          ? 'border-pink-500 bg-pink-50/80 shadow-sm'
-                          : 'border-purple-500 bg-purple-50/80 shadow-sm'
-                        : 'border-slate-100 hover:border-slate-200 bg-slate-50/50'
+                          ? 'border-pink-500 bg-pink-50/80 dark:bg-pink-950/60 shadow-sm'
+                          : 'border-purple-500 bg-purple-50/80 dark:bg-purple-950/60 shadow-sm'
+                        : 'border-slate-100 dark:border-slate-800 hover:border-slate-200 dark:hover:border-slate-700 bg-slate-50/50 dark:bg-slate-800/50'
                     }`}
                   >
                     <span className="text-xl mb-0.5">{profile.icon}</span>
-                    <span className="text-xs font-bold text-slate-800">{profile.shortName}</span>
+                    <span className="text-xs font-bold text-slate-800 dark:text-slate-100">{profile.shortName}</span>
                   </button>
                 );
               })}
@@ -209,7 +209,7 @@ export const TaskModal: React.FC = () => {
           {/* Date and Time */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
             <div>
-              <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">
+              <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1">
                 Fecha *
               </label>
               <div className="relative">
@@ -218,60 +218,59 @@ export const TaskModal: React.FC = () => {
                   required
                   value={date}
                   onChange={(e) => setDate(e.target.value)}
-                  className="w-full pl-9 pr-3 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-pink-400 text-sm bg-white"
+                  className="w-full pl-10 pr-3 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-pink-400 text-sm"
                 />
-                <Calendar className="w-4 h-4 text-slate-400 absolute left-3 top-3 pointer-events-none" />
+                <Calendar className="w-4 h-4 text-slate-400 absolute left-3.5 top-3 pointer-events-none" />
               </div>
             </div>
 
             <div>
               <div className="flex items-center justify-between mb-1">
-                <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider">
-                  Hora
+                <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 uppercase tracking-wider">
+                  Horario
                 </label>
-                <label className="flex items-center gap-1.5 text-xs text-slate-500 cursor-pointer select-none">
+                <label className="inline-flex items-center gap-1.5 cursor-pointer text-xs text-slate-500 dark:text-slate-400 font-medium">
                   <input
                     type="checkbox"
                     checked={allDay}
                     onChange={(e) => setAllDay(e.target.checked)}
-                    className="rounded text-pink-500 focus:ring-pink-400 cursor-pointer"
+                    className="rounded border-slate-300 text-pink-500 focus:ring-pink-400"
                   />
                   <span>Todo el día</span>
                 </label>
               </div>
 
               {!allDay ? (
-                <div>
-                  <div className="flex items-center gap-1.5">
-                    <div className="relative flex-1 min-w-0">
+                <div className="space-y-1.5">
+                  <div className="flex items-center gap-2">
+                    <div className="relative min-w-0 flex-1">
                       <input
                         type="time"
                         value={time}
                         onChange={(e) => setTime(e.target.value)}
-                        className="w-full pl-7 pr-1 py-2 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-pink-400 text-xs font-semibold text-slate-700 bg-white"
+                        className="w-full pl-8 pr-2 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-pink-400 text-xs sm:text-sm"
                         title="Hora de inicio"
                       />
-                      <Clock className="w-3.5 h-3.5 text-slate-400 absolute left-2 top-2.5 pointer-events-none" />
+                      <Clock className="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-2.5 sm:top-3 pointer-events-none" />
                     </div>
-                    <span className="text-slate-400 text-xs font-bold px-0.5">a</span>
-                    <div className="relative flex-1 min-w-0">
+                    <span className="text-slate-400 dark:text-slate-500 text-xs font-bold flex-shrink-0">a</span>
+                    <div className="relative min-w-0 flex-1">
                       <input
                         type="time"
                         value={endTime}
                         onChange={(e) => setEndTime(e.target.value)}
-                        placeholder="Hasta"
-                        className="w-full pl-7 pr-1 py-2 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-pink-400 text-xs font-semibold text-slate-700 bg-white"
+                        className="w-full pl-8 pr-2 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-pink-400 text-xs sm:text-sm"
                         title="Hora de fin (opcional)"
                       />
-                      <Clock className="w-3.5 h-3.5 text-slate-400 absolute left-2 top-2.5 pointer-events-none" />
+                      <Clock className="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-2.5 sm:top-3 pointer-events-none" />
                     </div>
                   </div>
-                  <p className="text-[10px] text-slate-400 mt-1 pl-1">
+                  <p className="text-[10px] text-slate-400 dark:text-slate-500 text-right">
                     Inicio y fin (ej. 18:00 a 20:00 hs)
                   </p>
                 </div>
               ) : (
-                <div className="py-2.5 px-3 bg-slate-50 text-slate-400 rounded-xl text-xs text-center border border-slate-100">
+                <div className="py-2.5 px-3 bg-slate-50 dark:bg-slate-800 text-slate-400 dark:text-slate-500 rounded-xl text-xs text-center border border-slate-100 dark:border-slate-700">
                   Sin horario específico (todo el día)
                 </div>
               )}
@@ -280,7 +279,7 @@ export const TaskModal: React.FC = () => {
 
           {/* Category */}
           <div>
-            <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">
+            <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5">
               Categoría
             </label>
             <div className="flex flex-wrap gap-1.5">
@@ -291,10 +290,10 @@ export const TaskModal: React.FC = () => {
                     key={cat.id}
                     type="button"
                     onClick={() => setCategory(cat.id)}
-                    className={`inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-medium transition-all ${
+                    className={`inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-medium transition-all cursor-pointer ${
                       isSelected
-                        ? `${cat.badgeBg} ${cat.badgeText} ring-2 ring-pink-400 shadow-sm font-semibold scale-105`
-                        : 'bg-slate-100/70 text-slate-600 hover:bg-slate-200/70'
+                        ? `${cat.badgeBg} ${cat.badgeText} ring-2 ring-pink-400 dark:ring-pink-600 shadow-sm font-semibold scale-105`
+                        : 'bg-slate-100/70 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200/70 dark:hover:bg-slate-700'
                     }`}
                   >
                     <span>{cat.icon}</span>
@@ -308,13 +307,13 @@ export const TaskModal: React.FC = () => {
           {/* Priority & Reminder */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
-              <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">
+              <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1">
                 Prioridad
               </label>
               <select
                 value={priority}
                 onChange={(e) => setPriority(e.target.value as Priority)}
-                className="w-full px-3 py-2 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-pink-400 text-sm bg-white"
+                className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-pink-400 text-sm"
               >
                 <option value="low">🌱 Normal / Tranqui</option>
                 <option value="medium">⚡ Importante</option>
@@ -323,7 +322,7 @@ export const TaskModal: React.FC = () => {
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">
+              <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1">
                 <span className="inline-flex items-center gap-1">
                   <Bell className="w-3.5 h-3.5 text-amber-500" />
                   Aviso / Notificación
@@ -332,7 +331,7 @@ export const TaskModal: React.FC = () => {
               <select
                 value={reminder}
                 onChange={(e) => setReminder(e.target.value as ReminderOffset)}
-                className="w-full px-3 py-2 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-pink-400 text-sm bg-white"
+                className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-pink-400 text-sm"
               >
                 <option value="none">Sin recordatorio</option>
                 <option value="at_time">Al momento exacto</option>
@@ -345,7 +344,7 @@ export const TaskModal: React.FC = () => {
 
           {/* Recurrence */}
           <div>
-            <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">
+            <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1">
               <span className="inline-flex items-center gap-1">
                 <RefreshCw className="w-3.5 h-3.5 text-slate-400" />
                 Repetición
@@ -354,7 +353,7 @@ export const TaskModal: React.FC = () => {
             <select
               value={recurrence}
               onChange={(e) => setRecurrence(e.target.value as RecurrenceType)}
-              className="w-full px-3 py-2 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-pink-400 text-sm bg-white"
+              className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-pink-400 text-sm"
             >
               <option value="none">No se repite</option>
               <option value="daily">Todos los días</option>
@@ -365,12 +364,12 @@ export const TaskModal: React.FC = () => {
 
             {/* Custom Days of Week Selector when Weekly is chosen */}
             {recurrence === 'weekly' && (
-              <div className="mt-2.5 p-3 bg-pink-50/50 rounded-2xl border border-pink-100/80">
+              <div className="mt-2.5 p-3 bg-pink-50/50 dark:bg-slate-800/80 rounded-2xl border border-pink-100/80 dark:border-slate-700">
                 <div className="flex items-center justify-between mb-2">
-                  <p className="text-[11px] font-bold text-slate-700">
+                  <p className="text-[11px] font-bold text-slate-700 dark:text-slate-300">
                     ¿Qué días se repite?
                   </p>
-                  <span className="text-[10px] text-pink-600 font-semibold">
+                  <span className="text-[10px] text-pink-600 dark:text-pink-400 font-semibold">
                     {recurrenceDays.length} días seleccionados
                   </span>
                 </div>
@@ -384,8 +383,8 @@ export const TaskModal: React.FC = () => {
                         onClick={() => toggleRecurrenceDay(day.dayIndex)}
                         className={`h-9 flex flex-col items-center justify-center rounded-xl text-xs font-bold transition-all cursor-pointer ${
                           isSelected
-                            ? 'bg-pink-500 text-white shadow-sm shadow-pink-200 scale-102'
-                            : 'bg-white text-slate-600 hover:bg-pink-100/40 border border-slate-200'
+                            ? 'bg-pink-500 text-white shadow-sm shadow-pink-200 dark:shadow-none scale-102'
+                            : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-pink-100/40 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700'
                         }`}
                         title={day.label}
                       >
@@ -394,7 +393,7 @@ export const TaskModal: React.FC = () => {
                     );
                   })}
                 </div>
-                <p className="text-[10px] text-slate-400 mt-1.5 text-center">
+                <p className="text-[10px] text-slate-400 dark:text-slate-500 mt-1.5 text-center">
                   Ej. Toca <strong>L, X y V</strong> para Lunes, Miércoles y Viernes
                 </p>
               </div>
@@ -403,7 +402,7 @@ export const TaskModal: React.FC = () => {
 
           {/* Description */}
           <div>
-            <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">
+            <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1">
               Detalles o notas (opcional)
             </label>
             <textarea
@@ -411,17 +410,17 @@ export const TaskModal: React.FC = () => {
               placeholder="¿Algún detalle para recordar juntos? Lugar, lista o número de teléfono..."
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              className="w-full px-3.5 py-2 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-pink-400 text-sm resize-none"
+              className="w-full px-3.5 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-pink-400 text-sm resize-none"
             />
           </div>
 
           {/* Footer Actions */}
-          <div className="pt-3 border-t border-slate-100 flex items-center justify-between gap-3">
+          <div className="pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between gap-3">
             {editingTask ? (
               <button
                 type="button"
                 onClick={handleDelete}
-                className="inline-flex items-center gap-1 px-3 py-2 text-rose-600 hover:bg-rose-50 rounded-xl text-xs font-semibold transition-colors"
+                className="inline-flex items-center gap-1 px-3 py-2 text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40 rounded-xl text-xs font-semibold transition-colors cursor-pointer"
               >
                 <Trash2 className="w-4 h-4" />
                 Eliminar
@@ -434,15 +433,15 @@ export const TaskModal: React.FC = () => {
               <button
                 type="button"
                 onClick={closeTaskModal}
-                className="px-4 py-2 text-slate-600 hover:bg-slate-100 rounded-xl text-xs font-semibold transition-colors"
+                className="px-4 py-2 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl text-xs font-semibold transition-colors cursor-pointer"
               >
                 Cancelar
               </button>
               <button
                 type="submit"
-                className="px-5 py-2 bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-600 hover:to-rose-600 text-white rounded-xl text-xs font-bold shadow-md hover:shadow-lg transition-all"
+                className="px-5 py-2 rounded-xl bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-600 hover:to-rose-600 text-white text-xs font-bold shadow-md hover:shadow-lg transition-all active:scale-95 cursor-pointer"
               >
-                {editingTask ? 'Guardar Cambios' : 'Crear en el Almanaque'}
+                {editingTask ? 'Guardar Cambios' : 'Agendar Tarea'}
               </button>
             </div>
           </div>

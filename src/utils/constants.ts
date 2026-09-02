@@ -6,9 +6,9 @@ export const PROFILES: Record<string, UserProfileInfo> = {
     name: 'Jerónimo',
     shortName: 'Jero',
     avatarColor: 'bg-blue-500 text-white',
-    badgeBg: 'bg-blue-50 text-blue-700 border-blue-200',
-    badgeText: 'text-blue-700',
-    borderColor: 'border-blue-300',
+    badgeBg: 'bg-blue-50 dark:bg-blue-950/60 text-blue-700 dark:text-blue-300 border-blue-200 dark:border-blue-800/80',
+    badgeText: 'text-blue-700 dark:text-blue-300',
+    borderColor: 'border-blue-300 dark:border-blue-700',
     icon: '👨🏻‍💻',
   },
   zahria: {
@@ -16,9 +16,9 @@ export const PROFILES: Record<string, UserProfileInfo> = {
     name: 'Zahria',
     shortName: 'Zahri',
     avatarColor: 'bg-pink-500 text-white',
-    badgeBg: 'bg-pink-50 text-pink-700 border-pink-200',
-    badgeText: 'text-pink-700',
-    borderColor: 'border-pink-300',
+    badgeBg: 'bg-pink-50 dark:bg-pink-950/60 text-pink-700 dark:text-pink-300 border-pink-200 dark:border-pink-800/80',
+    badgeText: 'text-pink-700 dark:text-pink-300',
+    borderColor: 'border-pink-300 dark:border-pink-700',
     icon: '👩🏻‍🎨',
   },
   both: {
@@ -26,22 +26,22 @@ export const PROFILES: Record<string, UserProfileInfo> = {
     name: 'Ambos / Juntos',
     shortName: 'Juntos',
     avatarColor: 'bg-gradient-to-r from-pink-500 via-purple-500 to-blue-500 text-white',
-    badgeBg: 'bg-purple-50 text-purple-700 border-purple-200',
-    badgeText: 'text-purple-700',
-    borderColor: 'border-purple-300',
+    badgeBg: 'bg-purple-50 dark:bg-purple-950/60 text-purple-700 dark:text-purple-300 border-purple-200 dark:border-purple-800/80',
+    badgeText: 'text-purple-700 dark:text-purple-300',
+    borderColor: 'border-purple-300 dark:border-purple-700',
     icon: '💑',
   }
 };
 
 export const CATEGORIES: CategoryInfo[] = [
-  { id: 'pareja', name: 'Cita / Pareja', icon: '❤️', color: 'text-pink-500', badgeBg: 'bg-pink-100/70', badgeText: 'text-pink-700' },
-  { id: 'hogar', name: 'Hogar & Casa', icon: '🏠', color: 'text-amber-500', badgeBg: 'bg-amber-100/70', badgeText: 'text-amber-700' },
-  { id: 'compras', name: 'Compras & Super', icon: '🛒', color: 'text-emerald-500', badgeBg: 'bg-emerald-100/70', badgeText: 'text-emerald-700' },
-  { id: 'finanzas', name: 'Finanzas & Pagos', icon: '💳', color: 'text-indigo-500', badgeBg: 'bg-indigo-100/70', badgeText: 'text-indigo-700' },
-  { id: 'salud', name: 'Salud & Bienestar', icon: '🩺', color: 'text-teal-500', badgeBg: 'bg-teal-100/70', badgeText: 'text-teal-700' },
-  { id: 'viajes', name: 'Viajes & Salidas', icon: '✈️', color: 'text-sky-500', badgeBg: 'bg-sky-100/70', badgeText: 'text-sky-700' },
-  { id: 'trabajo', name: 'Trabajo & Proyectos', icon: '💼', color: 'text-violet-500', badgeBg: 'bg-violet-100/70', badgeText: 'text-violet-700' },
-  { id: 'otro', name: 'Recordatorio', icon: '📌', color: 'text-slate-500', badgeBg: 'bg-slate-100/70', badgeText: 'text-slate-700' },
+  { id: 'pareja', name: 'Cita / Pareja', icon: '❤️', color: 'text-pink-500', badgeBg: 'bg-pink-100/70 dark:bg-pink-950/60', badgeText: 'text-pink-700 dark:text-pink-300' },
+  { id: 'hogar', name: 'Hogar & Casa', icon: '🏠', color: 'text-amber-500', badgeBg: 'bg-amber-100/70 dark:bg-amber-950/60', badgeText: 'text-amber-700 dark:text-amber-300' },
+  { id: 'compras', name: 'Compras & Super', icon: '🛒', color: 'text-emerald-500', badgeBg: 'bg-emerald-100/70 dark:bg-emerald-950/60', badgeText: 'text-emerald-700 dark:text-emerald-300' },
+  { id: 'finanzas', name: 'Finanzas & Pagos', icon: '💳', color: 'text-indigo-500', badgeBg: 'bg-indigo-100/70 dark:bg-indigo-950/60', badgeText: 'text-indigo-700 dark:text-indigo-300' },
+  { id: 'salud', name: 'Salud & Bienestar', icon: '🩺', color: 'text-teal-500', badgeBg: 'bg-teal-100/70 dark:bg-teal-950/60', badgeText: 'text-teal-700 dark:text-teal-300' },
+  { id: 'viajes', name: 'Viajes & Salidas', icon: '✈️', color: 'text-sky-500', badgeBg: 'bg-sky-100/70 dark:bg-sky-950/60', badgeText: 'text-sky-700 dark:text-sky-300' },
+  { id: 'trabajo', name: 'Trabajo & Proyectos', icon: '💼', color: 'text-violet-500', badgeBg: 'bg-violet-100/70 dark:bg-violet-950/60', badgeText: 'text-violet-700 dark:text-violet-300' },
+  { id: 'otro', name: 'Recordatorio', icon: '📌', color: 'text-slate-500', badgeBg: 'bg-slate-100/70 dark:bg-slate-800/80', badgeText: 'text-slate-700 dark:text-slate-300' },
 ];
 
 export const INITIAL_TASKS: Task[] = [

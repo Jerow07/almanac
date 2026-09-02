@@ -56,14 +56,14 @@ export const PriorityBadge: React.FC<{ priority: Priority }> = ({ priority }) =>
 
   if (priority === 'high') {
     return (
-      <span className="inline-flex items-center gap-0.5 text-[11px] font-semibold text-rose-600 bg-rose-50 px-1.5 py-0.5 rounded-md border border-rose-200">
+      <span className="inline-flex items-center gap-0.5 text-[11px] font-semibold text-rose-600 dark:text-rose-400 bg-rose-50 dark:bg-rose-950/50 px-1.5 py-0.5 rounded-md border border-rose-200 dark:border-rose-900/60">
         🔥 Urgente
       </span>
     );
   }
 
   return (
-    <span className="inline-flex items-center gap-0.5 text-[11px] font-medium text-amber-700 bg-amber-50 px-1.5 py-0.5 rounded-md border border-amber-200">
+    <span className="inline-flex items-center gap-0.5 text-[11px] font-medium text-amber-700 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/50 px-1.5 py-0.5 rounded-md border border-amber-200 dark:border-amber-900/60">
       ⚡ Importante
     </span>
   );

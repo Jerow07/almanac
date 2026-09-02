@@ -44,11 +44,11 @@ export const MonthView: React.FC = () => {
   return (
     <div className="space-y-4 w-full max-w-full overflow-hidden">
       {/* Month Calendar Card */}
-      <div className="bg-white rounded-3xl shadow-sm border border-slate-100 overflow-hidden w-full max-w-full">
+      <div className="bg-white dark:bg-slate-900 rounded-3xl shadow-sm border border-slate-100 dark:border-slate-800 overflow-hidden w-full max-w-full transition-colors duration-200">
         {/* Weekday Header */}
-        <div className="grid grid-cols-7 border-b border-slate-100 bg-slate-50/70 text-center py-2.5">
+        <div className="grid grid-cols-7 border-b border-slate-100 dark:border-slate-800 bg-slate-50/70 dark:bg-slate-900/80 text-center py-2.5">
           {DAYS_OF_WEEK.map((day) => (
-            <div key={day.short} className="text-xs font-bold text-slate-500 uppercase tracking-wider">
+            <div key={day.short} className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
               <span className="hidden sm:inline">{day.full}</span>
               <span className="sm:hidden">{day.short}</span>
             </div>
@@ -56,7 +56,7 @@ export const MonthView: React.FC = () => {
         </div>
 
         {/* Days Grid */}
-        <div className="grid grid-cols-7 auto-rows-fr divide-x divide-y divide-slate-100 min-h-[360px] sm:min-h-[580px]">
+        <div className="grid grid-cols-7 auto-rows-fr divide-x divide-y divide-slate-100 dark:divide-slate-800 min-h-[360px] sm:min-h-[580px]">
           {days.map((day) => {
             const dateKey = formatDateKey(day);
             const dayTasks = tasksByDate[dateKey] || [];
@@ -75,10 +75,10 @@ export const MonthView: React.FC = () => {
                 onClick={() => handleDayClick(dateKey)}
                 className={`group relative p-1 sm:p-2 transition-all flex flex-col justify-between cursor-pointer min-h-[56px] sm:min-h-[105px] ${
                   !isCurrentMonth
-                    ? 'bg-slate-50/30 opacity-40'
+                    ? 'bg-slate-50/30 dark:bg-slate-950/40 opacity-40 dark:opacity-30'
                     : isSelected
-                    ? 'bg-pink-50/40 ring-2 ring-inset ring-pink-400/80 z-10'
-                    : 'bg-white hover:bg-slate-50/80'
+                    ? 'bg-pink-50/40 dark:bg-pink-950/30 ring-2 ring-inset ring-pink-400/80 z-10'
+                    : 'bg-white dark:bg-slate-900 hover:bg-slate-50/80 dark:hover:bg-slate-800/60'
                 }`}
               >
                 {/* Day Header */}
@@ -89,7 +89,7 @@ export const MonthView: React.FC = () => {
                         ? 'bg-pink-500 text-white shadow-md'
                         : isSelected
                         ? 'bg-purple-600 text-white shadow-sm'
-                        : 'text-slate-700 group-hover:text-pink-600'
+                        : 'text-slate-700 dark:text-slate-300 group-hover:text-pink-600 dark:group-hover:text-pink-400'
                     }`}
                   >
                     {day.getDate()}
@@ -101,7 +101,7 @@ export const MonthView: React.FC = () => {
                       e.stopPropagation();
                       openNewTaskModal(dateKey);
                     }}
-                    className="hidden sm:flex w-5 h-5 rounded-md items-center justify-center text-slate-300 hover:text-pink-500 hover:bg-pink-50 transition-all opacity-0 group-hover:opacity-100"
+                    className="hidden sm:flex w-5 h-5 rounded-md items-center justify-center text-slate-300 dark:text-slate-600 hover:text-pink-500 dark:hover:text-pink-400 hover:bg-pink-50 dark:hover:bg-pink-950/50 transition-all opacity-0 group-hover:opacity-100"
                     title="Agregar tarea en este día"
                   >
                     <Plus className="w-3.5 h-3.5 stroke-[2.5]" />
@@ -154,17 +154,17 @@ export const MonthView: React.FC = () => {
       </div>
 
       {/* SELECTED DAY INSPECTOR (Especially helpful on mobile) */}
-      <div className="bg-white rounded-3xl p-4 sm:p-5 border border-pink-100/80 shadow-sm animate-in fade-in duration-150">
-        <div className="flex items-center justify-between pb-3 mb-3 border-b border-slate-100">
+      <div className="bg-white dark:bg-slate-900 rounded-3xl p-4 sm:p-5 border border-pink-100/80 dark:border-slate-800 shadow-sm animate-in fade-in duration-150 transition-colors">
+        <div className="flex items-center justify-between pb-3 mb-3 border-b border-slate-100 dark:border-slate-800">
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-2xl bg-pink-50 text-pink-600 flex items-center justify-center">
+            <div className="w-8 h-8 rounded-2xl bg-pink-50 dark:bg-pink-950/50 text-pink-600 dark:text-pink-400 flex items-center justify-center">
               <CalendarIcon className="w-4 h-4" />
             </div>
             <div>
-              <h3 className="text-sm sm:text-base font-extrabold text-slate-800 capitalize">
+              <h3 className="text-sm sm:text-base font-extrabold text-slate-800 dark:text-slate-100 capitalize">
                 {formatFriendlyDate(selectedDate)}
               </h3>
-              <p className="text-[11px] text-slate-400">
+              <p className="text-[11px] text-slate-400 dark:text-slate-500">
                 {selectedDayTasks.length === 0
                   ? 'Sin planes registrados'
                   : `${selectedDayTasks.length} ${
@@ -177,7 +177,7 @@ export const MonthView: React.FC = () => {
           <button
             type="button"
             onClick={() => openNewTaskModal(selectedDate)}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-pink-50 hover:bg-pink-100 text-pink-600 text-xs font-bold transition-all shadow-xs"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-pink-50 dark:bg-pink-950/60 hover:bg-pink-100 dark:hover:bg-pink-900/60 text-pink-600 dark:text-pink-300 text-xs font-bold transition-all shadow-xs cursor-pointer active:scale-95"
           >
             <Plus className="w-3.5 h-3.5 stroke-[3]" />
             <span>Agregar tarea</span>
@@ -188,13 +188,13 @@ export const MonthView: React.FC = () => {
         {selectedDayTasks.length === 0 ? (
           <div
             onClick={() => openNewTaskModal(selectedDate)}
-            className="py-6 px-4 text-center border-2 border-dashed border-slate-100 hover:border-pink-200 rounded-2xl cursor-pointer transition-all group"
+            className="py-6 px-4 text-center border-2 border-dashed border-slate-100 dark:border-slate-800 hover:border-pink-200 dark:hover:border-pink-800/80 rounded-2xl cursor-pointer transition-all group"
           >
-            <Sparkles className="w-6 h-6 text-slate-300 group-hover:text-pink-400 mx-auto mb-1.5 transition-colors" />
-            <p className="text-xs font-semibold text-slate-600 group-hover:text-pink-600 transition-colors">
+            <Sparkles className="w-6 h-6 text-slate-300 dark:text-slate-600 group-hover:text-pink-400 mx-auto mb-1.5 transition-colors" />
+            <p className="text-xs font-semibold text-slate-600 dark:text-slate-400 group-hover:text-pink-600 dark:group-hover:text-pink-400 transition-colors">
               No hay tareas para este día
             </p>
-            <p className="text-[11px] text-slate-400 mt-0.5">
+            <p className="text-[11px] text-slate-400 dark:text-slate-500 mt-0.5">
               Toca aquí para programar un plan o recordatorio juntos.
             </p>
           </div>
