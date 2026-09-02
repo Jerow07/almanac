@@ -8,6 +8,11 @@ self.addEventListener('activate', (event) => {
   event.waitUntil(self.clients.claim());
 });
 
+// Pass-through fetch handler (required by Google Chrome for PWA installability)
+self.addEventListener('fetch', (event) => {
+  // Let the browser handle standard requests
+});
+
 // Handle incoming push notification
 self.addEventListener('push', (event) => {
   let data = {};
@@ -22,8 +27,8 @@ self.addEventListener('push', (event) => {
   const title = data.title || 'Recordatorio de Almanac 💖';
   const options = {
     body: data.message || 'Tienes una tarea o plan programado.',
-    icon: '/calendar-heart.svg',
-    badge: '/calendar-heart.svg',
+    icon: '/icon-192.png',
+    badge: '/icon-192.png',
     tag: data.taskId || 'almanac-reminder',
     data: data,
     vibrate: [200, 100, 200]
