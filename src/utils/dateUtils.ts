@@ -87,6 +87,101 @@ export const formatDateKey = (date: Date): string => {
   return format(date, 'yyyy-MM-dd');
 };
 
+export const WEEK_DAYS_SELECTOR = [
+  { dayIndex: 1, short: 'L', label: 'Lun' },
+  { dayIndex: 2, short: 'M', label: 'Mar' },
+  { dayIndex: 3, short: 'X', label: 'Mié' },
+  { dayIndex: 4, short: 'J', label: 'Jue' },
+  { dayIndex: 5, short: 'V', label: 'Vie' },
+  { dayIndex: 6, short: 'S', label: 'Sáb' },
+  { dayIndex: 0, short: 'D', label: 'Dom' },
+];
+
+/**
+ * Checks whether a task should appear on a given target date based on its recurrence rule.
+ */
+export const isTaskOnDate = (
+  task: { date: string; recurrence?: string; recurrenceDays?: number[] },
+  targetDate: Date | string
+): boolean => {
+  const targetDateObj = typeof targetDate === 'string' ? parseISO(targetDate) : targetDate;
+  const targetDateKey = formatDateKey(targetDateObj);
+  const taskStartDate = parseISO(task.date);
+  const taskStartKey = task.date;
+
+  // Cannot occur before the task start date
+  if (targetDateKey < taskStartKey) {
+    return false;
+  }
+
+  // Exact start date always matches
+  if (targetDateKey === taskStartKey) {
+    return true;
+  }
+
+  if (!task.recurrence || task.recurrence === 'none') {
+    return false;
+  }
+
+  if (task.recurrence === 'daily') {
+    return true;
+  }
+
+  if (task.recurrence === 'weekly') {
+    const dayOfWeek = targetDateObj.getDay(); // 0 (Sun) to 6 (Sat)
+    if (task.recurrenceDays && task.recurrenceDays.length > 0) {
+      return task.recurrenceDays.includes(dayOfWeek);
+    }
+    // Default weekly: matches the day of the week of the start date
+    return dayOfWeek === taskStartDate.getDay();
+  }
+
+  if (task.recurrence === 'monthly') {
+    return targetDateObj.getDate() === taskStartDate.getDate();
+  }
+
+  if (task.recurrence === 'yearly') {
+    return (
+      targetDateObj.getMonth() === taskStartDate.getMonth() &&
+      targetDateObj.getDate() === taskStartDate.getDate()
+    );
+  }
+
+  return false;
+};
+
+/**
+ * Friendly label for recurrence and selected days
+ */
+export const formatRecurrenceLabel = (
+  recurrence?: string,
+  recurrenceDays?: number[]
+): string => {
+  if (!recurrence || recurrence === 'none') return '';
+  if (recurrence === 'daily') return 'Diario';
+  if (recurrence === 'monthly') return 'Mensual';
+  if (recurrence === 'yearly') return 'Anual';
+  if (recurrence === 'weekly') {
+    if (recurrenceDays && recurrenceDays.length > 0 && recurrenceDays.length < 7) {
+      const dayNames = [
+        { d: 1, name: 'Lun' },
+        { d: 2, name: 'Mar' },
+        { d: 3, name: 'Mié' },
+        { d: 4, name: 'Jue' },
+        { d: 5, name: 'Vie' },
+        { d: 6, name: 'Sáb' },
+        { d: 0, name: 'Dom' },
+      ];
+      const selectedNames = dayNames
+        .filter((item) => recurrenceDays.includes(item.d))
+        .map((item) => item.name);
+      return selectedNames.length > 0 ? selectedNames.join(', ') : 'Semanal';
+    }
+    return 'Semanal';
+  }
+  return '';
+};
+
 export {
   format,
   isSameMonth,

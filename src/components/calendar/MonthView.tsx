@@ -7,6 +7,7 @@ import {
   isToday,
   formatDateKey,
   formatFriendlyDate,
+  isTaskOnDate,
 } from '../../utils/dateUtils';
 import { TaskCard } from '../tasks/TaskCard';
 import { sounds } from '../../utils/sound';
@@ -21,17 +22,17 @@ export const MonthView: React.FC = () => {
     formatDateKey(new Date())
   );
 
-  // Group tasks by date string
+  // Group tasks by date string (including recurring task expansion for the displayed month grid)
   const tasksByDate = React.useMemo(() => {
     const map: Record<string, typeof filteredTasks> = {};
-    filteredTasks.forEach((t) => {
-      if (!map[t.date]) {
-        map[t.date] = [];
-      }
-      map[t.date].push(t);
+    days.forEach((day) => {
+      const dateKey = formatDateKey(day);
+      map[dateKey] = filteredTasks
+        .filter((t) => isTaskOnDate(t, day))
+        .map((t) => (t.date === dateKey ? t : { ...t, date: dateKey }));
     });
     return map;
-  }, [filteredTasks]);
+  }, [filteredTasks, days]);
 
   const selectedDayTasks = tasksByDate[selectedDate] || [];
 

@@ -1,5 +1,6 @@
 import { Task } from '../types';
 import { sounds } from '../utils/sound';
+import { isTaskOnDate, formatDateKey } from '../utils/dateUtils';
 
 export interface AppNotification {
   id: string;
@@ -133,14 +134,16 @@ class NotificationService {
   public checkTaskReminders(tasks: Task[], onAlert?: (notif: AppNotification) => void): AppNotification[] {
     if (!this.isEnabled) return [];
     const now = new Date();
+    const todayStr = formatDateKey(now);
     const newAlerts: AppNotification[] = [];
 
     tasks.forEach((task) => {
       if (task.completed || task.reminder === 'none') return;
+      if (!isTaskOnDate(task, now)) return;
 
-      // Determine task trigger datetime
+      // Determine task trigger datetime for today
       const taskTime = task.time || '09:00';
-      const taskDateTime = new Date(`${task.date}T${taskTime}:00`);
+      const taskDateTime = new Date(`${todayStr}T${taskTime}:00`);
 
       if (isNaN(taskDateTime.getTime())) return;
 
@@ -162,7 +165,7 @@ class NotificationService {
 
       // If reminder time has passed within the last 2 hours and hasn't been notified yet
       const diffMs = now.getTime() - reminderTime.getTime();
-      const notificationKey = `${task.id}_${task.date}_${task.reminder}`;
+      const notificationKey = `${task.id}_${todayStr}_${task.reminder}`;
 
       if (diffMs >= 0 && diffMs <= 2 * 60 * 60 * 1000) {
         if (!this.notifiedTaskIds.has(notificationKey)) {

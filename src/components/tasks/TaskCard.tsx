@@ -2,6 +2,7 @@ import React from 'react';
 import { Task } from '../../types';
 import { useCalendar } from '../../context/CalendarContext';
 import { AssigneeBadge, CategoryBadge, PriorityBadge } from '../common/Badge';
+import { formatRecurrenceLabel } from '../../utils/dateUtils';
 import { Clock, Check, Edit2, Trash2, Bell } from 'lucide-react';
 
 interface TaskCardProps {
@@ -120,12 +121,10 @@ export const TaskCard: React.FC<TaskCardProps> = ({ task, compact = false }) => 
                     : `${task.time} hs`
                   : 'Sin hora'}
               </span>
-              {task.recurrence !== 'none' && (
-                <span className="text-[11px] bg-slate-100 text-slate-600 px-1.5 py-0.2 rounded">
-                  {task.recurrence === 'daily' && 'Diario'}
-                  {task.recurrence === 'weekly' && 'Semanal'}
-                  {task.recurrence === 'monthly' && 'Mensual'}
-                  {task.recurrence === 'yearly' && 'Anual'}
+              {task.recurrence && task.recurrence !== 'none' && (
+                <span className="text-[10px] bg-pink-50 text-pink-700 font-semibold px-1.5 py-0.5 rounded-md flex items-center gap-1 border border-pink-100/60">
+                  <span className="text-[11px]">🔄</span>
+                  <span>{formatRecurrenceLabel(task.recurrence, task.recurrenceDays)}</span>
                 </span>
               )}
             </div>

@@ -1,6 +1,6 @@
 import React from 'react';
 import { useCalendar } from '../../context/CalendarContext';
-import { getWeekDays, DAYS_OF_WEEK, isToday, formatDateKey } from '../../utils/dateUtils';
+import { getWeekDays, DAYS_OF_WEEK, isToday, formatDateKey, isTaskOnDate } from '../../utils/dateUtils';
 import { TaskCard } from '../tasks/TaskCard';
 import { Plus } from 'lucide-react';
 
@@ -8,15 +8,17 @@ export const WeekView: React.FC = () => {
   const { currentDate, filteredTasks, openNewTaskModal } = useCalendar();
   const weekDays = getWeekDays(currentDate);
 
-  // Group tasks by date
+  // Group tasks by date (including recurring tasks expansion for this week)
   const tasksByDate = React.useMemo(() => {
     const map: Record<string, typeof filteredTasks> = {};
-    filteredTasks.forEach((t) => {
-      if (!map[t.date]) map[t.date] = [];
-      map[t.date].push(t);
+    weekDays.forEach((day) => {
+      const dateKey = formatDateKey(day);
+      map[dateKey] = filteredTasks
+        .filter((t) => isTaskOnDate(t, day))
+        .map((t) => (t.date === dateKey ? t : { ...t, date: dateKey }));
     });
     return map;
-  }, [filteredTasks]);
+  }, [filteredTasks, weekDays]);
 
   return (
     <div className="bg-white rounded-3xl shadow-sm border border-slate-100 overflow-hidden w-full max-w-full">

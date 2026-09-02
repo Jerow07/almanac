@@ -33,6 +33,7 @@ export interface Task {
   completedAt?: string;
   completedBy?: Partner;
   recurrence: RecurrenceType;
+  recurrenceDays?: number[]; // [1, 3, 5] for Mon, Wed, Fri (0=Sun, 6=Sat)
   reminder: ReminderOffset;
   createdBy?: Partner;
   createdAt: string;

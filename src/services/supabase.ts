@@ -1,5 +1,5 @@
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
-import { Task } from '../types';
+import { Task, RecurrenceType } from '../types';
 
 export interface CloudConfig {
   url: string;
@@ -97,6 +97,21 @@ export const mapDbToTask = (row: any): Task => {
     }
   }
 
+  let recurrence: RecurrenceType = 'none';
+  let recurrenceDays: number[] | undefined = undefined;
+  if (row.recurrence && typeof row.recurrence === 'string') {
+    if (row.recurrence.startsWith('weekly:')) {
+      recurrence = 'weekly';
+      recurrenceDays = row.recurrence
+        .replace('weekly:', '')
+        .split(',')
+        .map((d: string) => parseInt(d, 10))
+        .filter((n: number) => !isNaN(n));
+    } else if (['daily', 'weekly', 'monthly', 'yearly'].includes(row.recurrence)) {
+      recurrence = row.recurrence as RecurrenceType;
+    }
+  }
+
   return {
     id: row.id,
     title: row.title,
@@ -111,7 +126,8 @@ export const mapDbToTask = (row: any): Task => {
     completed: Boolean(row.completed),
     completedAt,
     completedBy,
-    recurrence: row.recurrence || 'none',
+    recurrence,
+    recurrenceDays,
     reminder: row.reminder || 'none',
     createdBy,
     createdAt: row.created_at || new Date().toISOString(),
@@ -131,6 +147,11 @@ export const mapTaskToDb = (task: Task) => {
     timeValue = task.endTime ? `${task.time} - ${task.endTime}` : task.time;
   }
 
+  let recurrenceValue = task.recurrence;
+  if (task.recurrence === 'weekly' && task.recurrenceDays && task.recurrenceDays.length > 0) {
+    recurrenceValue = `weekly:${task.recurrenceDays.join(',')}` as any;
+  }
+
   return {
     id: task.id,
     title: task.title,
@@ -143,7 +164,7 @@ export const mapTaskToDb = (task: Task) => {
     priority: task.priority,
     completed: task.completed,
     completed_at: completedAtValue,
-    recurrence: task.recurrence,
+    recurrence: recurrenceValue,
     reminder: task.reminder,
     created_at: task.createdAt,
     updated_at: task.updatedAt,

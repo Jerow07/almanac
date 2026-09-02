@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useCalendar } from '../../context/CalendarContext';
 import { Assignee, TaskCategory, Priority, RecurrenceType, ReminderOffset } from '../../types';
 import { CATEGORIES, PROFILES } from '../../utils/constants';
+import { WEEK_DAYS_SELECTOR, parseISO } from '../../utils/dateUtils';
 import { X, Calendar, Clock, Bell, RefreshCw, Trash2, Heart } from 'lucide-react';
 
 export const TaskModal: React.FC = () => {
@@ -25,6 +26,7 @@ export const TaskModal: React.FC = () => {
   const [category, setCategory] = useState<TaskCategory>('pareja');
   const [priority, setPriority] = useState<Priority>('medium');
   const [recurrence, setRecurrence] = useState<RecurrenceType>('none');
+  const [recurrenceDays, setRecurrenceDays] = useState<number[]>([]);
   const [reminder, setReminder] = useState<ReminderOffset>('1_hour');
 
   useEffect(() => {
@@ -39,12 +41,18 @@ export const TaskModal: React.FC = () => {
       setCategory(editingTask.category);
       setPriority(editingTask.priority);
       setRecurrence(editingTask.recurrence);
+      setRecurrenceDays(
+        editingTask.recurrenceDays && editingTask.recurrenceDays.length > 0
+          ? editingTask.recurrenceDays
+          : [parseISO(editingTask.date).getDay()]
+      );
       setReminder(editingTask.reminder);
     } else {
       // Default new task
+      const defaultDate = selectedDateForNewTask || new Date().toISOString().split('T')[0];
       setTitle('');
       setDescription('');
-      setDate(selectedDateForNewTask || new Date().toISOString().split('T')[0]);
+      setDate(defaultDate);
       setTime('10:00');
       setEndTime('');
       setAllDay(false);
@@ -52,9 +60,20 @@ export const TaskModal: React.FC = () => {
       setCategory('pareja');
       setPriority('medium');
       setRecurrence('none');
+      setRecurrenceDays([parseISO(defaultDate).getDay()]);
       setReminder('1_hour');
     }
   }, [editingTask, selectedDateForNewTask, isTaskModalOpen]);
+
+  const toggleRecurrenceDay = (dayIndex: number) => {
+    setRecurrenceDays((prev) => {
+      if (prev.includes(dayIndex)) {
+        if (prev.length === 1) return prev; // keep at least 1 day
+        return prev.filter((d) => d !== dayIndex);
+      }
+      return [...prev, dayIndex];
+    });
+  };
 
   if (!isTaskModalOpen) return null;
 
@@ -74,6 +93,7 @@ export const TaskModal: React.FC = () => {
         category,
         priority,
         recurrence,
+        recurrenceDays: recurrence === 'weekly' ? recurrenceDays : undefined,
         reminder,
       });
     } else {
@@ -89,6 +109,7 @@ export const TaskModal: React.FC = () => {
         priority,
         completed: false,
         recurrence,
+        recurrenceDays: recurrence === 'weekly' ? recurrenceDays : undefined,
         reminder,
       });
     }
@@ -331,10 +352,47 @@ export const TaskModal: React.FC = () => {
             >
               <option value="none">No se repite</option>
               <option value="daily">Todos los días</option>
-              <option value="weekly">Todas las semanas</option>
+              <option value="weekly">Semanal (elegir días de la semana)</option>
               <option value="monthly">Todos los meses</option>
               <option value="yearly">Todos los años (Aniversarios/Cumples)</option>
             </select>
+
+            {/* Custom Days of Week Selector when Weekly is chosen */}
+            {recurrence === 'weekly' && (
+              <div className="mt-2.5 p-3 bg-pink-50/50 rounded-2xl border border-pink-100/80">
+                <div className="flex items-center justify-between mb-2">
+                  <p className="text-[11px] font-bold text-slate-700">
+                    ¿Qué días se repite?
+                  </p>
+                  <span className="text-[10px] text-pink-600 font-semibold">
+                    {recurrenceDays.length} días seleccionados
+                  </span>
+                </div>
+                <div className="grid grid-cols-7 gap-1.5">
+                  {WEEK_DAYS_SELECTOR.map((day) => {
+                    const isSelected = recurrenceDays.includes(day.dayIndex);
+                    return (
+                      <button
+                        key={day.dayIndex}
+                        type="button"
+                        onClick={() => toggleRecurrenceDay(day.dayIndex)}
+                        className={`h-9 flex flex-col items-center justify-center rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                          isSelected
+                            ? 'bg-pink-500 text-white shadow-sm shadow-pink-200 scale-102'
+                            : 'bg-white text-slate-600 hover:bg-pink-100/40 border border-slate-200'
+                        }`}
+                        title={day.label}
+                      >
+                        <span>{day.short}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+                <p className="text-[10px] text-slate-400 mt-1.5 text-center">
+                  Ej. Toca <strong>L, X y V</strong> para Lunes, Miércoles y Viernes
+                </p>
+              </div>
+            )}
           </div>
 
           {/* Description */}
