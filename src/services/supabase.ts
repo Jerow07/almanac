@@ -62,23 +62,34 @@ export const getSupabase = (): SupabaseClient | null => {
 };
 
 // Map database column names (snake_case) to Task interface (camelCase)
-export const mapDbToTask = (row: any): Task => ({
-  id: row.id,
-  title: row.title,
-  description: row.description || '',
-  date: row.date,
-  time: row.time || undefined,
-  allDay: Boolean(row.all_day),
-  assignee: row.assignee,
-  category: row.category,
-  priority: row.priority,
-  completed: Boolean(row.completed),
-  completedAt: row.completed_at || undefined,
-  recurrence: row.recurrence || 'none',
-  reminder: row.reminder || 'none',
-  createdAt: row.created_at || new Date().toISOString(),
-  updatedAt: row.updated_at || new Date().toISOString(),
-});
+export const mapDbToTask = (row: any): Task => {
+  let createdBy: 'jeronimo' | 'zahria' | undefined = undefined;
+  if (row.created_by) {
+    createdBy = row.created_by;
+  } else if (typeof row.id === 'string') {
+    if (row.id.startsWith('task_zahria_')) createdBy = 'zahria';
+    else if (row.id.startsWith('task_jeronimo_')) createdBy = 'jeronimo';
+  }
+
+  return {
+    id: row.id,
+    title: row.title,
+    description: row.description || '',
+    date: row.date,
+    time: row.time || undefined,
+    allDay: Boolean(row.all_day),
+    assignee: row.assignee,
+    category: row.category,
+    priority: row.priority,
+    completed: Boolean(row.completed),
+    completedAt: row.completed_at || undefined,
+    recurrence: row.recurrence || 'none',
+    reminder: row.reminder || 'none',
+    createdBy,
+    createdAt: row.created_at || new Date().toISOString(),
+    updatedAt: row.updated_at || new Date().toISOString(),
+  };
+};
 
 export const mapTaskToDb = (task: Task) => ({
   id: task.id,

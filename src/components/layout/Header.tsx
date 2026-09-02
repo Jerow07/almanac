@@ -33,6 +33,8 @@ export const Header: React.FC = () => {
     importTasksFromFile,
     openCloudModal,
     isCloudConnected,
+    currentUser,
+    setCurrentUser,
   } = useCalendar();
 
   const { unreadCount } = useNotification();
@@ -79,11 +81,39 @@ export const Header: React.FC = () => {
                   Almanac
                 </h1>
               </div>
-              <p className="text-[11px] font-medium text-slate-500 flex items-center gap-1">
-                <span className="text-blue-600 font-semibold">Jerónimo</span>
-                <span className="text-pink-400">♥</span>
-                <span className="text-pink-600 font-semibold">Zahria</span>
-              </p>
+              <div className="flex items-center gap-1 mt-0.5 text-slate-500">
+                <button
+                  type="button"
+                  onClick={() => setCurrentUser('jeronimo')}
+                  className={`px-2 py-0.5 rounded-lg text-[10px] sm:text-[11px] font-bold transition-all flex items-center gap-1 ${
+                    currentUser === 'jeronimo'
+                      ? 'bg-blue-600 text-white shadow-xs'
+                      : 'text-blue-700 bg-blue-50/70 hover:bg-blue-100/70'
+                  }`}
+                  title="Configurar este dispositivo como Jerónimo"
+                >
+                  <span>👨🏻‍💻</span>
+                  <span>Jerónimo</span>
+                  {currentUser === 'jeronimo' && <span className="text-[9px] opacity-90 hidden xs:inline">(Tú)</span>}
+                </button>
+
+                <span className="text-pink-400 text-xs">♥</span>
+
+                <button
+                  type="button"
+                  onClick={() => setCurrentUser('zahria')}
+                  className={`px-2 py-0.5 rounded-lg text-[10px] sm:text-[11px] font-bold transition-all flex items-center gap-1 ${
+                    currentUser === 'zahria'
+                      ? 'bg-pink-600 text-white shadow-xs'
+                      : 'text-pink-700 bg-pink-50/70 hover:bg-pink-100/70'
+                  }`}
+                  title="Configurar este dispositivo como Zahria"
+                >
+                  <span>👩🏻‍🎨</span>
+                  <span>Zahria</span>
+                  {currentUser === 'zahria' && <span className="text-[9px] opacity-90 hidden xs:inline">(Tú)</span>}
+                </button>
+              </div>
             </div>
           </div>
 

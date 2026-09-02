@@ -1,6 +1,10 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { notificationService, AppNotification } from '../services/notifications';
 import { useCalendar } from './CalendarContext';
+import { sounds } from '../utils/sound';
+import { triggerConfetti } from '../utils/confetti';
+import { formatFriendlyDate } from '../utils/dateUtils';
+import { Task } from '../types';
 
 interface NotificationContextType {
   notifications: AppNotification[];
@@ -16,7 +20,7 @@ interface NotificationContextType {
 const NotificationContext = createContext<NotificationContextType | undefined>(undefined);
 
 export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const { tasks } = useCalendar();
+  const { tasks, currentUser } = useCalendar();
   const [notifications, setNotifications] = useState<AppNotification[]>(() => {
     try {
       const saved = localStorage.getItem('almanac_recent_notifications');
@@ -41,28 +45,96 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
     }
   }, [notifications]);
 
-  // Periodic reminder checking
+  // Periodic reminder checking for scheduled alerts
   useEffect(() => {
     const check = () => {
       notificationService.checkTaskReminders(tasks, (newAlert) => {
-        setNotifications((prev) => [newAlert, ...prev].slice(0, 20)); // Keep last 20
+        setNotifications((prev) => [newAlert, ...prev].slice(0, 25));
       });
     };
 
-    // Immediate check
     check();
-
-    // Check every 30 seconds
     const interval = setInterval(check, 30000);
     return () => clearInterval(interval);
   }, [tasks]);
+
+  // Listen to remote partner actions (e.g., partner adds or completes a task)
+  useEffect(() => {
+    const handlePartnerAction = (e: Event) => {
+      const customEvent = e as CustomEvent<{ type: 'insert' | 'complete'; task: Task }>;
+      if (!customEvent.detail) return;
+      const { type, task } = customEvent.detail;
+
+      const partnerName = currentUser === 'jeronimo' ? 'Zahria' : 'Jerónimo';
+      const otherPartnerKey = currentUser === 'jeronimo' ? 'zahria' : 'jeronimo';
+
+      if (type === 'insert') {
+        const isCreatedByPartner =
+          task.createdBy === otherPartnerKey ||
+          task.id.startsWith(`task_${otherPartnerKey}_`);
+
+        if (isCreatedByPartner) {
+          const title = `¡${partnerName} agregó un plan! 💖`;
+          const message = `"${task.title}" para el ${formatFriendlyDate(task.date)}`;
+
+          // 1. Play alert sound
+          sounds.playNotification();
+
+          // 2. Native browser push notification
+          notificationService.showSystemNotification(title, {
+            body: message,
+            tag: task.id,
+          });
+
+          // 3. Add to notification drawer
+          setNotifications((prev) => [
+            {
+              id: 'partner_' + Date.now(),
+              taskId: task.id,
+              title,
+              message,
+              timestamp: new Date().toISOString(),
+              read: false,
+            },
+            ...prev,
+          ].slice(0, 25));
+        }
+      } else if (type === 'complete') {
+        const title = `¡${partnerName} completó una tarea! 🎉`;
+        const message = `"${task.title}"`;
+
+        sounds.playSuccessChime();
+        triggerConfetti();
+
+        notificationService.showSystemNotification(title, {
+          body: message,
+          tag: task.id,
+        });
+
+        setNotifications((prev) => [
+          {
+            id: 'complete_' + Date.now(),
+            taskId: task.id,
+            title,
+            message,
+            timestamp: new Date().toISOString(),
+            read: false,
+          },
+          ...prev,
+        ].slice(0, 25));
+      }
+    };
+
+    window.addEventListener('almanac:partner-action', handlePartnerAction);
+    return () => window.removeEventListener('almanac:partner-action', handlePartnerAction);
+  }, [currentUser]);
 
   const requestPermission = async () => {
     const status = await notificationService.requestPermission();
     setPermissionStatus(status);
     if (status === 'granted') {
       notificationService.showSystemNotification('¡Notificaciones activadas en Almanac! 💖', {
-        body: 'Te avisaremos a ti y a Zahria antes de cada tarea importante.',
+        body: 'Te avisaremos a ti y a Zahria antes de cada tarea y cuando agreguen planes.',
       });
     }
   };

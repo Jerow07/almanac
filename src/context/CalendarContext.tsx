@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, useMemo, useCallback } from 'react';
-import { Task, Assignee, CalendarViewType, TaskCategory } from '../types';
+import { Task, Assignee, CalendarViewType, TaskCategory, Partner } from '../types';
 import { storageService } from '../services/storage';
 import { sounds } from '../utils/sound';
 import { triggerConfetti } from '../utils/confetti';
@@ -23,6 +23,7 @@ interface CalendarContextType {
   filteredTasks: Task[];
   currentDate: Date;
   view: CalendarViewType;
+  currentUser: Partner;
   assigneeFilter: 'all' | Assignee;
   categoryFilter: 'all' | TaskCategory;
   searchQuery: string;
@@ -36,6 +37,7 @@ interface CalendarContextType {
   // Actions
   setView: (view: CalendarViewType) => void;
   setCurrentDate: (date: Date) => void;
+  setCurrentUser: (user: Partner) => void;
   setAssigneeFilter: (filter: 'all' | Assignee) => void;
   setCategoryFilter: (filter: 'all' | TaskCategory) => void;
   setSearchQuery: (query: string) => void;
@@ -71,6 +73,18 @@ export const CalendarProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   const [soundEnabled, setSoundEnabled] = useState<boolean>(sounds.isEnabled());
   const [isCloudModalOpen, setIsCloudModalOpen] = useState(false);
   const [isCloudConnected, setIsCloudConnected] = useState<boolean>(() => Boolean(getStoredCloudConfig()));
+
+  // Active user on this device ('jeronimo' or 'zahria')
+  const [currentUser, setCurrentUserState] = useState<Partner>(() => {
+    const saved = localStorage.getItem('almanac_current_user');
+    return saved === 'zahria' ? 'zahria' : 'jeronimo';
+  });
+
+  const setCurrentUser = (user: Partner) => {
+    setCurrentUserState(user);
+    localStorage.setItem('almanac_current_user', user);
+    sounds.playPop();
+  };
 
   // Modal states
   const [isTaskModalOpen, setIsTaskModalOpen] = useState(false);
@@ -113,9 +127,24 @@ export const CalendarProvider: React.FC<{ children: React.ReactNode }> = ({ chil
               if (prev.some((t) => t.id === newTask.id)) return prev;
               return [newTask, ...prev];
             });
+
+            // Dispatch event for partner notification
+            window.dispatchEvent(
+              new CustomEvent('almanac:partner-action', {
+                detail: { type: 'insert', task: newTask }
+              })
+            );
           } else if (payload.eventType === 'UPDATE') {
             const updated = mapDbToTask(payload.new);
             setTasks((prev) => prev.map((t) => (t.id === updated.id ? updated : t)));
+
+            if (payload.new.completed && !(payload.old as any)?.completed) {
+              window.dispatchEvent(
+                new CustomEvent('almanac:partner-action', {
+                  detail: { type: 'complete', task: updated }
+                })
+              );
+            }
           } else if (payload.eventType === 'DELETE') {
             const deletedId = payload.old.id;
             setTasks((prev) => prev.filter((t) => t.id !== deletedId));
@@ -163,7 +192,8 @@ export const CalendarProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   const addTask = (taskData: Omit<Task, 'id' | 'createdAt' | 'updatedAt'>) => {
     const newTask: Task = {
       ...taskData,
-      id: 'task_' + Date.now() + '_' + Math.random().toString(36).substring(2, 7),
+      id: `task_${currentUser}_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`,
+      createdBy: currentUser,
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
     };
@@ -309,6 +339,8 @@ export const CalendarProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         filteredTasks,
         currentDate,
         view,
+        currentUser,
+        setCurrentUser,
         assigneeFilter,
         categoryFilter,
         searchQuery,

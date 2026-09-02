@@ -1,3 +1,5 @@
+export type Partner = 'jeronimo' | 'zahria';
+
 export type Assignee = 'jeronimo' | 'zahria' | 'both';
 
 export type Priority = 'low' | 'medium' | 'high';
@@ -30,6 +32,7 @@ export interface Task {
   completedAt?: string;
   recurrence: RecurrenceType;
   reminder: ReminderOffset;
+  createdBy?: Partner;
   createdAt: string;
   updatedAt: string;
 }
