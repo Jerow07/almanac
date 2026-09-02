@@ -85,12 +85,25 @@ export const mapDbToTask = (row: any): Task => {
     }
   }
 
+  let startTime: string | undefined = undefined;
+  let endTime: string | undefined = undefined;
+  if (row.time && typeof row.time === 'string') {
+    if (row.time.includes(' - ')) {
+      const parts = row.time.split(' - ');
+      startTime = parts[0]?.trim() || undefined;
+      endTime = parts[1]?.trim() || undefined;
+    } else {
+      startTime = row.time.trim();
+    }
+  }
+
   return {
     id: row.id,
     title: row.title,
     description: row.description || '',
     date: row.date,
-    time: row.time || undefined,
+    time: startTime,
+    endTime,
     allDay: Boolean(row.all_day),
     assignee: row.assignee,
     category: row.category,
@@ -113,12 +126,17 @@ export const mapTaskToDb = (task: Task) => {
     completedAtValue = task.completedBy ? `${isoDate}_by_${task.completedBy}` : isoDate;
   }
 
+  let timeValue: string | null = null;
+  if (!task.allDay && task.time) {
+    timeValue = task.endTime ? `${task.time} - ${task.endTime}` : task.time;
+  }
+
   return {
     id: task.id,
     title: task.title,
     description: task.description || null,
     date: task.date,
-    time: task.time || null,
+    time: timeValue,
     all_day: task.allDay,
     assignee: task.assignee,
     category: task.category,

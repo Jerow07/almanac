@@ -22,6 +22,7 @@ export const NotificationDrawer: React.FC<NotificationDrawerProps> = ({ isOpen, 
     requestPermission,
     markAsRead,
     markAllAsRead,
+    deleteNotification,
     clearNotifications,
   } = useNotification();
 
@@ -61,11 +62,15 @@ export const NotificationDrawer: React.FC<NotificationDrawerProps> = ({ isOpen, 
               <span className="text-slate-300">|</span>
               <button
                 type="button"
-                onClick={clearNotifications}
-                className="text-slate-400 hover:text-rose-500 cursor-pointer"
-                title="Limpiar avisos"
+                onClick={() => {
+                  clearNotifications();
+                  sounds.playPop();
+                }}
+                className="text-slate-400 hover:text-rose-500 font-medium flex items-center gap-1 cursor-pointer"
+                title="Limpiar todos los avisos"
               >
                 <Trash2 className="w-3.5 h-3.5" />
+                <span>Limpiar</span>
               </button>
             </div>
           )}
@@ -189,16 +194,29 @@ export const NotificationDrawer: React.FC<NotificationDrawerProps> = ({ isOpen, 
                     </span>
                   </div>
 
-                  {!notif.read && (
+                  <div className="flex items-center gap-1 flex-shrink-0">
+                    {!notif.read && (
+                      <button
+                        type="button"
+                        onClick={() => markAsRead(notif.id)}
+                        className="p-1 rounded-full text-slate-300 hover:text-emerald-600 hover:bg-emerald-50 cursor-pointer"
+                        title="Marcar como leída"
+                      >
+                        <Check className="w-3.5 h-3.5" />
+                      </button>
+                    )}
                     <button
                       type="button"
-                      onClick={() => markAsRead(notif.id)}
-                      className="p-1 rounded-full text-slate-300 hover:text-emerald-600 hover:bg-emerald-50 cursor-pointer"
-                      title="Marcar como leída"
+                      onClick={() => {
+                        deleteNotification(notif.id);
+                        sounds.playClick();
+                      }}
+                      className="p-1 rounded-full text-slate-300 hover:text-rose-500 hover:bg-rose-50 cursor-pointer"
+                      title="Eliminar este aviso"
                     >
-                      <Check className="w-3.5 h-3.5" />
+                      <Trash2 className="w-3.5 h-3.5" />
                     </button>
-                  )}
+                  </div>
                 </div>
               );
             })

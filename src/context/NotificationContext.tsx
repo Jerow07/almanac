@@ -16,6 +16,7 @@ interface NotificationContextType {
   requestPermission: () => Promise<void>;
   markAsRead: (id: string) => void;
   markAllAsRead: () => void;
+  deleteNotification: (id: string) => void;
   clearNotifications: () => void;
 }
 
@@ -86,8 +87,19 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
           task.id.startsWith(`task_${otherPartnerKey}_`);
 
         if (isCreatedByPartner) {
-          const title = `¡${partnerName} agregó un plan! 💖`;
-          const message = `"${task.title}" para el ${formatFriendlyDate(task.date)}`;
+          let title = `¡${partnerName} agregó un plan! 💖`;
+          if (task.assignee === currentUser) {
+            title = `¡${partnerName} te asignó una tarea! 📌`;
+          } else if (task.assignee === 'both') {
+            title = `¡${partnerName} agregó un plan juntos! 💑`;
+          } else {
+            title = `¡${partnerName} agregó su tarea! 🌸`;
+          }
+
+          const timeInfo = task.time
+            ? ` a las ${task.time}${task.endTime ? `-${task.endTime}` : ''} hs`
+            : '';
+          const message = `"${task.title}" para el ${formatFriendlyDate(task.date)}${timeInfo}`;
 
           // 1. Play alert sound (if enabled)
           if (notificationsEnabled) {
@@ -122,8 +134,23 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
         }
 
         const partnerName = completer === 'zahria' ? 'Zahria' : 'Jerónimo';
-        const title = `¡${partnerName} completó una tarea! 🎉`;
-        const message = `"${task.title}"`;
+
+        let title = '';
+        let message = '';
+
+        if (task.assignee === currentUser) {
+          // The partner completed a task that was assigned to YOU!
+          title = `¡${partnerName} completó tu tarea! 💖`;
+          message = `"${task.title}" (¡Te dio una mano con tu pendiente!)`;
+        } else if (task.assignee === 'both') {
+          // The partner completed a shared couple plan!
+          title = `¡${partnerName} completó el plan juntos! 💑`;
+          message = `"${task.title}" (¡Plan en pareja cumplido!)`;
+        } else {
+          // The partner completed their own task!
+          title = `¡${partnerName} completó su tarea! 👏`;
+          message = `"${task.title}"`;
+        }
 
         if (notificationsEnabled) {
           sounds.playSuccessChime();
@@ -173,8 +200,17 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
     setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
   };
 
+  const deleteNotification = (id: string) => {
+    setNotifications((prev) => prev.filter((n) => n.id !== id));
+  };
+
   const clearNotifications = () => {
     setNotifications([]);
+    try {
+      localStorage.removeItem('almanac_recent_notifications');
+    } catch {
+      // ignore
+    }
   };
 
   const unreadCount = notifications.filter((n) => !n.read).length;
@@ -191,6 +227,7 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
         requestPermission,
         markAsRead,
         markAllAsRead,
+        deleteNotification,
         clearNotifications,
       }}
     >

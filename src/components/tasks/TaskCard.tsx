@@ -46,7 +46,7 @@ export const TaskCard: React.FC<TaskCardProps> = ({ task, compact = false }) => 
 
         {task.time && !task.allDay && (
           <span className="text-[10px] text-slate-500 font-normal flex-shrink-0">
-            {task.time}
+            {task.time}{task.endTime ? ` - ${task.endTime}` : ''}
           </span>
         )}
       </div>
@@ -110,9 +110,15 @@ export const TaskCard: React.FC<TaskCardProps> = ({ task, compact = false }) => 
 
           <div className="flex items-center justify-between mt-2.5 pt-2 border-t border-slate-100 text-xs text-slate-500">
             <div className="flex items-center gap-2">
-              <span className="flex items-center gap-1">
+              <span className="flex items-center gap-1 font-medium">
                 <Clock className="w-3 h-3 text-slate-400" />
-                {task.allDay ? 'Todo el día' : task.time || 'Sin hora'}
+                {task.allDay
+                  ? 'Todo el día'
+                  : task.time
+                  ? task.endTime
+                    ? `${task.time} a ${task.endTime} hs`
+                    : `${task.time} hs`
+                  : 'Sin hora'}
               </span>
               {task.recurrence !== 'none' && (
                 <span className="text-[11px] bg-slate-100 text-slate-600 px-1.5 py-0.2 rounded">

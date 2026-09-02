@@ -23,7 +23,8 @@ export interface Task {
   title: string;
   description?: string;
   date: string; // YYYY-MM-DD
-  time?: string; // HH:mm (optional, if allDay is false)
+  time?: string; // HH:mm (hora de inicio)
+  endTime?: string; // HH:mm (hora de fin, opcional)
   allDay: boolean;
   assignee: Assignee;
   category: TaskCategory;

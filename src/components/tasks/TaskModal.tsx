@@ -19,6 +19,7 @@ export const TaskModal: React.FC = () => {
   const [description, setDescription] = useState('');
   const [date, setDate] = useState('');
   const [time, setTime] = useState('12:00');
+  const [endTime, setEndTime] = useState('');
   const [allDay, setAllDay] = useState(false);
   const [assignee, setAssignee] = useState<Assignee>('both');
   const [category, setCategory] = useState<TaskCategory>('pareja');
@@ -32,6 +33,7 @@ export const TaskModal: React.FC = () => {
       setDescription(editingTask.description || '');
       setDate(editingTask.date);
       setTime(editingTask.time || '12:00');
+      setEndTime(editingTask.endTime || '');
       setAllDay(editingTask.allDay);
       setAssignee(editingTask.assignee);
       setCategory(editingTask.category);
@@ -44,6 +46,7 @@ export const TaskModal: React.FC = () => {
       setDescription('');
       setDate(selectedDateForNewTask || new Date().toISOString().split('T')[0]);
       setTime('10:00');
+      setEndTime('');
       setAllDay(false);
       setAssignee('both');
       setCategory('pareja');
@@ -64,7 +67,8 @@ export const TaskModal: React.FC = () => {
         title: title.trim(),
         description: description.trim(),
         date,
-        time: allDay ? undefined : time,
+        time: allDay ? undefined : (time || undefined),
+        endTime: allDay ? undefined : (endTime || undefined),
         allDay,
         assignee,
         category,
@@ -77,7 +81,8 @@ export const TaskModal: React.FC = () => {
         title: title.trim(),
         description: description.trim(),
         date,
-        time: allDay ? undefined : time,
+        time: allDay ? undefined : (time || undefined),
+        endTime: allDay ? undefined : (endTime || undefined),
         allDay,
         assignee,
         category,
@@ -209,14 +214,34 @@ export const TaskModal: React.FC = () => {
               </div>
 
               {!allDay ? (
-                <div className="relative">
-                  <input
-                    type="time"
-                    value={time}
-                    onChange={(e) => setTime(e.target.value)}
-                    className="w-full pl-9 pr-3 py-2 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-pink-400 text-sm"
-                  />
-                  <Clock className="w-4 h-4 text-slate-400 absolute left-3 top-2.5 pointer-events-none" />
+                <div>
+                  <div className="flex items-center gap-1.5">
+                    <div className="relative flex-1">
+                      <input
+                        type="time"
+                        value={time}
+                        onChange={(e) => setTime(e.target.value)}
+                        className="w-full pl-8 pr-1 py-2 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-pink-400 text-xs font-semibold text-slate-700"
+                        title="Hora de inicio"
+                      />
+                      <Clock className="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-2.5 pointer-events-none" />
+                    </div>
+                    <span className="text-slate-400 text-xs font-bold px-0.5">a</span>
+                    <div className="relative flex-1">
+                      <input
+                        type="time"
+                        value={endTime}
+                        onChange={(e) => setEndTime(e.target.value)}
+                        placeholder="Hasta"
+                        className="w-full pl-8 pr-1 py-2 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-pink-400 text-xs font-semibold text-slate-700"
+                        title="Hora de fin (opcional)"
+                      />
+                      <Clock className="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-2.5 pointer-events-none" />
+                    </div>
+                  </div>
+                  <p className="text-[10px] text-slate-400 mt-1 pl-1">
+                    Inicio y fin (ej. 18:00 a 20:00 hs)
+                  </p>
                 </div>
               ) : (
                 <div className="py-2 px-3 bg-slate-50 text-slate-400 rounded-xl text-xs text-center border border-slate-100">
