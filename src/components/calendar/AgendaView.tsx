@@ -2,12 +2,17 @@ import React from 'react';
 import { useCalendar } from '../../context/CalendarContext';
 import { TaskCard } from '../tasks/TaskCard';
 import { Task } from '../../types';
-import { formatFriendlyDate } from '../../utils/dateUtils';
-import { isToday, isPast, parseISO, isFuture } from 'date-fns';
+import { formatFriendlyDate, formatDateKey, isTaskOnDate } from '../../utils/dateUtils';
+import { addDays } from 'date-fns';
 import { Plus, CheckCircle2, CalendarHeart } from 'lucide-react';
 
 export const AgendaView: React.FC = () => {
   const { filteredTasks, openNewTaskModal } = useCalendar();
+
+  const now = React.useMemo(() => new Date(), []);
+  const todayStr = React.useMemo(() => formatDateKey(now), [now]);
+  const tomorrowDate = React.useMemo(() => addDays(now, 1), [now]);
+  const tomorrowStr = React.useMemo(() => formatDateKey(tomorrowDate), [tomorrowDate]);
 
   // Group tasks into logical sections
   const { overdue, today, tomorrow, upcoming, completed } = React.useMemo(() => {
@@ -17,28 +22,41 @@ export const AgendaView: React.FC = () => {
     const upcoming: Task[] = [];
     const completed: Task[] = [];
 
-    const now = new Date();
-    const todayStr = now.toISOString().split('T')[0];
-    const tomorrowDate = new Date(Date.now() + 86400000);
-    const tomorrowStr = tomorrowDate.toISOString().split('T')[0];
-
     filteredTasks.forEach((task) => {
       if (task.completed) {
         completed.push(task);
         return;
       }
 
+      const isRecurring = Boolean(task.recurrence && task.recurrence !== 'none');
+
+      if (isRecurring) {
+        if (isTaskOnDate(task, now)) {
+          today.push(task);
+        } else if (isTaskOnDate(task, tomorrowDate)) {
+          tomorrow.push(task);
+        } else {
+          // Look ahead up to 30 days for upcoming occurrence
+          for (let i = 2; i <= 30; i++) {
+            const nextDate = addDays(now, i);
+            if (isTaskOnDate(task, nextDate)) {
+              upcoming.push({ ...task, date: formatDateKey(nextDate) });
+              break;
+            }
+          }
+        }
+        return;
+      }
+
+      // Single non-recurring task
       if (task.date === todayStr) {
         today.push(task);
       } else if (task.date === tomorrowStr) {
         tomorrow.push(task);
-      } else {
-        const taskDate = parseISO(task.date);
-        if (isPast(taskDate) && !isToday(taskDate)) {
-          overdue.push(task);
-        } else if (isFuture(taskDate)) {
-          upcoming.push(task);
-        }
+      } else if (task.date < todayStr) {
+        overdue.push(task);
+      } else if (task.date > tomorrowStr) {
+        upcoming.push(task);
       }
     });
 
@@ -50,7 +68,7 @@ export const AgendaView: React.FC = () => {
     upcoming.sort(sortFn);
 
     return { overdue, today, tomorrow, upcoming, completed };
-  }, [filteredTasks]);
+  }, [filteredTasks, now, todayStr, tomorrowDate, tomorrowStr]);
 
   const totalActive = overdue.length + today.length + tomorrow.length + upcoming.length;
 
@@ -103,7 +121,7 @@ export const AgendaView: React.FC = () => {
                 Para Hoy ({today.length})
               </h3>
             </div>
-            <span className="text-xs text-slate-400 dark:text-slate-500">{formatFriendlyDate(new Date().toISOString().split('T')[0])}</span>
+            <span className="text-xs text-slate-400 dark:text-slate-500">{formatFriendlyDate(todayStr)}</span>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             {today.map((task) => (
