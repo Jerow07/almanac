@@ -12,8 +12,8 @@ export interface AppNotification {
 
 class NotificationService {
   private notifiedTaskIds: Set<string> = new Set();
-
   private swRegistration: ServiceWorkerRegistration | null = null;
+  private isEnabled: boolean = true;
 
   constructor() {
     try {
@@ -21,11 +21,29 @@ class NotificationService {
       if (stored) {
         this.notifiedTaskIds = new Set(JSON.parse(stored));
       }
+      const storedEnabled = localStorage.getItem('almanac_notifications_enabled');
+      if (storedEnabled !== null) {
+        this.isEnabled = storedEnabled !== 'false';
+      }
     } catch {
       this.notifiedTaskIds = new Set();
+      this.isEnabled = true;
     }
 
     this.registerServiceWorker();
+  }
+
+  public setEnabled(enabled: boolean) {
+    this.isEnabled = enabled;
+    try {
+      localStorage.setItem('almanac_notifications_enabled', String(enabled));
+    } catch {
+      // ignore
+    }
+  }
+
+  public getEnabled(): boolean {
+    return this.isEnabled;
   }
 
   public registerServiceWorker() {
@@ -73,7 +91,7 @@ class NotificationService {
    * Display native system notification (Universal for iOS PWA, Android and Desktop)
    */
   public async showSystemNotification(title: string, options?: NotificationOptions) {
-    if (!this.isSupported() || Notification.permission !== 'granted') {
+    if (!this.isEnabled || !this.isSupported() || Notification.permission !== 'granted') {
       return;
     }
 
@@ -112,6 +130,7 @@ class NotificationService {
    * Evaluates if any tasks are due according to their reminder configuration
    */
   public checkTaskReminders(tasks: Task[], onAlert?: (notif: AppNotification) => void): AppNotification[] {
+    if (!this.isEnabled) return [];
     const now = new Date();
     const newAlerts: AppNotification[] = [];
 

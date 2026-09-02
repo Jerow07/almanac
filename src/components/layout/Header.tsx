@@ -15,6 +15,7 @@ import {
   Volume2,
   VolumeX,
   Bell,
+  BellOff,
   Download,
   Upload,
   Cloud,
@@ -37,7 +38,7 @@ export const Header: React.FC = () => {
     setCurrentUser,
   } = useCalendar();
 
-  const { unreadCount } = useNotification();
+  const { unreadCount, notificationsEnabled } = useNotification();
   const [isNotifOpen, setIsNotifOpen] = useState(false);
   const [isBackupMenuOpen, setIsBackupMenuOpen] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -190,10 +191,14 @@ export const Header: React.FC = () => {
                 type="button"
                 onClick={() => setIsNotifOpen(!isNotifOpen)}
                 className="relative p-1.5 sm:p-2 rounded-xl border border-slate-200 hover:bg-slate-50 text-slate-600 transition-all"
-                title="Avisos y recordatorios"
+                title={notificationsEnabled ? 'Avisos y recordatorios' : 'Notificaciones en pausa'}
               >
-                <Bell className="w-4 h-4" />
-                {unreadCount > 0 && (
+                {notificationsEnabled ? (
+                  <Bell className="w-4 h-4 text-slate-600" />
+                ) : (
+                  <BellOff className="w-4 h-4 text-slate-400" />
+                )}
+                {unreadCount > 0 && notificationsEnabled && (
                   <span className="absolute -top-1 -right-1 w-4 h-4 bg-pink-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center shadow-sm animate-bounce">
                     {unreadCount > 9 ? '9+' : unreadCount}
                   </span>

@@ -9,6 +9,8 @@ import { Task } from '../types';
 interface NotificationContextType {
   notifications: AppNotification[];
   unreadCount: number;
+  notificationsEnabled: boolean;
+  toggleNotificationsEnabled: () => void;
   permissionStatus: NotificationPermission;
   isSupported: boolean;
   requestPermission: () => Promise<void>;
@@ -21,6 +23,16 @@ const NotificationContext = createContext<NotificationContextType | undefined>(u
 
 export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { tasks, currentUser } = useCalendar();
+  const [notificationsEnabled, setNotificationsEnabled] = useState<boolean>(() =>
+    notificationService.getEnabled()
+  );
+
+  const toggleNotificationsEnabled = () => {
+    const next = !notificationsEnabled;
+    setNotificationsEnabled(next);
+    notificationService.setEnabled(next);
+    sounds.playPop();
+  };
   const [notifications, setNotifications] = useState<AppNotification[]>(() => {
     try {
       const saved = localStorage.getItem('almanac_recent_notifications');
@@ -77,8 +89,10 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
           const title = `¡${partnerName} agregó un plan! 💖`;
           const message = `"${task.title}" para el ${formatFriendlyDate(task.date)}`;
 
-          // 1. Play alert sound
-          sounds.playNotification();
+          // 1. Play alert sound (if enabled)
+          if (notificationsEnabled) {
+            sounds.playNotification();
+          }
 
           // 2. Native browser push notification
           notificationService.showSystemNotification(title, {
@@ -103,8 +117,10 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
         const title = `¡${partnerName} completó una tarea! 🎉`;
         const message = `"${task.title}"`;
 
-        sounds.playSuccessChime();
-        triggerConfetti();
+        if (notificationsEnabled) {
+          sounds.playSuccessChime();
+          triggerConfetti();
+        }
 
         notificationService.showSystemNotification(title, {
           body: message,
@@ -127,7 +143,7 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
 
     window.addEventListener('almanac:partner-action', handlePartnerAction);
     return () => window.removeEventListener('almanac:partner-action', handlePartnerAction);
-  }, [currentUser]);
+  }, [currentUser, notificationsEnabled]);
 
   const requestPermission = async () => {
     const status = await notificationService.requestPermission();
@@ -160,6 +176,8 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
       value={{
         notifications,
         unreadCount,
+        notificationsEnabled,
+        toggleNotificationsEnabled,
         permissionStatus,
         isSupported,
         requestPermission,

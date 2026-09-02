@@ -1,7 +1,7 @@
 import React from 'react';
 import { createPortal } from 'react-dom';
 import { useNotification } from '../../context/NotificationContext';
-import { Bell, Check, Trash2, BellRing, Sparkles, AlertCircle } from 'lucide-react';
+import { Bell, Check, Trash2, BellRing, Sparkles, AlertCircle, BellOff } from 'lucide-react';
 import { formatDistanceToNow, parseISO } from 'date-fns';
 import { es } from 'date-fns/locale';
 
@@ -13,6 +13,8 @@ interface NotificationDrawerProps {
 export const NotificationDrawer: React.FC<NotificationDrawerProps> = ({ isOpen, onClose }) => {
   const {
     notifications,
+    notificationsEnabled,
+    toggleNotificationsEnabled,
     permissionStatus,
     isSupported,
     requestPermission,
@@ -62,6 +64,43 @@ export const NotificationDrawer: React.FC<NotificationDrawerProps> = ({ isOpen, 
               </button>
             </div>
           )}
+        </div>
+
+        {/* Master In-App Notifications Switch */}
+        <div className="flex items-center justify-between px-4 py-2.5 bg-slate-50/80 border-b border-slate-100 text-xs">
+          <div className="flex items-center gap-2">
+            {notificationsEnabled ? (
+              <Bell className="w-4 h-4 text-pink-500" />
+            ) : (
+              <BellOff className="w-4 h-4 text-slate-400" />
+            )}
+            <div>
+              <p className="font-bold text-slate-700">
+                {notificationsEnabled ? 'Avisos en la app: Activos' : 'Avisos en la app: En Pausa'}
+              </p>
+              <p className="text-[10px] text-slate-400">
+                {notificationsEnabled
+                  ? 'Recibes alertas de planes y tareas'
+                  : 'Silenciados dentro de Almanac'}
+              </p>
+            </div>
+          </div>
+
+          {/* Toggle Switch */}
+          <button
+            type="button"
+            onClick={toggleNotificationsEnabled}
+            className={`w-11 h-6 flex items-center rounded-full p-0.5 transition-colors cursor-pointer ${
+              notificationsEnabled ? 'bg-pink-500' : 'bg-slate-300'
+            }`}
+            title={notificationsEnabled ? 'Pausar avisos' : 'Activar avisos'}
+          >
+            <div
+              className={`bg-white w-5 h-5 rounded-full shadow-md transform transition-transform duration-200 ${
+                notificationsEnabled ? 'translate-x-5' : 'translate-x-0'
+              }`}
+            />
+          </button>
         </div>
 
         {/* Permission banner if needed */}
