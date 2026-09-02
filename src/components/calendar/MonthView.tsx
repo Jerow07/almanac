@@ -64,14 +64,10 @@ export const MonthView: React.FC = () => {
             const isCurrentDay = isToday(day);
             const isSelected = selectedDate === dateKey;
 
-            // Check assignees for colored dots
-            const hasJeronimo = dayTasks.some(
-              (t) => t.assignee === 'jeronimo' || t.assignee === 'both'
-            );
-            const hasZahria = dayTasks.some(
-              (t) => t.assignee === 'zahria' || t.assignee === 'both'
-            );
-            const hasBothOnly = dayTasks.some((t) => t.assignee === 'both');
+            // Check distinct assignees for colored dots
+            const hasJeronimo = dayTasks.some((t) => t.assignee === 'jeronimo');
+            const hasZahria = dayTasks.some((t) => t.assignee === 'zahria');
+            const hasBoth = dayTasks.some((t) => t.assignee === 'both');
 
             return (
               <div
@@ -126,7 +122,7 @@ export const MonthView: React.FC = () => {
                       title="Zahria"
                     />
                   )}
-                  {hasBothOnly && (
+                  {hasBoth && (
                     <span
                       className="w-2 h-2 rounded-full bg-purple-500 shadow-xs"
                       title="Juntos"
