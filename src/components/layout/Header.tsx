@@ -4,7 +4,7 @@ import { useNotification } from '../../context/NotificationContext';
 import { NotificationDrawer } from '../notifications/NotificationDrawer';
 import { MonthPickerModal } from '../calendar/MonthPickerModal';
 import { useTheme } from '../../context/ThemeContext';
-import { formatMonthHeader, isSameMonth } from '../../utils/dateUtils';
+import { formatMonthHeader, isCurrentPeriod } from '../../utils/dateUtils';
 import {
   Calendar as CalendarIcon,
   CalendarDays,
@@ -49,7 +49,8 @@ export const Header: React.FC = () => {
   const [isNotifOpen, setIsNotifOpen] = useState(false);
   const [isBackupMenuOpen, setIsBackupMenuOpen] = useState(false);
   const [isMonthPickerOpen, setIsMonthPickerOpen] = useState(false);
-  const isCurrentMonth = isSameMonth(currentDate, new Date());
+  const isCurrent = isCurrentPeriod(currentDate, view);
+  const navLabel = view === 'week' ? 'semana' : view === 'year' ? 'año' : 'mes';
   const fileInputRef = useRef<HTMLInputElement>(null);
   const headerRef = useRef<HTMLDivElement>(null);
 
@@ -132,7 +133,7 @@ export const Header: React.FC = () => {
               type="button"
               onClick={() => navigateDate('prev')}
               className="p-1.5 hover:bg-white dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white rounded-xl transition-all shadow-2xs cursor-pointer active:scale-95"
-              title="Mes anterior"
+              title={`${navLabel.charAt(0).toUpperCase() + navLabel.slice(1)} anterior`}
             >
               <ChevronLeft className="w-4 h-4" />
             </button>
@@ -152,17 +153,17 @@ export const Header: React.FC = () => {
               type="button"
               onClick={() => navigateDate('next')}
               className="p-1.5 hover:bg-white dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white rounded-xl transition-all shadow-2xs cursor-pointer active:scale-95"
-              title="Mes siguiente"
+              title={`${navLabel.charAt(0).toUpperCase() + navLabel.slice(1)} siguiente`}
             >
               <ChevronRight className="w-4 h-4" />
             </button>
 
-            {!isCurrentMonth && (
+            {!isCurrent && (
               <button
                 type="button"
                 onClick={() => navigateDate('today')}
-                className="ml-1 px-2.5 py-1 text-xs font-bold text-pink-600 dark:text-pink-300 bg-pink-50 dark:bg-pink-950/60 hover:bg-pink-100 dark:hover:bg-pink-900/60 rounded-xl border border-pink-200/80 dark:border-pink-800/60 transition-all cursor-pointer flex items-center gap-1"
-                title="Volver al día de hoy"
+                className="ml-1 px-2.5 py-1 text-xs font-bold text-pink-600 dark:text-pink-300 bg-pink-50 dark:bg-pink-950/60 hover:bg-pink-100 dark:hover:bg-pink-900/60 rounded-xl border border-pink-200/80 dark:border-pink-800/60 transition-all cursor-pointer flex items-center gap-1 active:scale-95"
+                title="Volver a hoy"
               >
                 <span>↩</span>
                 <span>Hoy</span>
@@ -344,7 +345,7 @@ export const Header: React.FC = () => {
                 type="button"
                 onClick={() => navigateDate('prev')}
                 className="p-1.5 rounded-xl border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 active:scale-95 cursor-pointer"
-                title="Mes anterior"
+                title={`${navLabel.charAt(0).toUpperCase() + navLabel.slice(1)} anterior`}
               >
                 <ChevronLeft className="w-3.5 h-3.5" />
               </button>
@@ -364,18 +365,18 @@ export const Header: React.FC = () => {
                 type="button"
                 onClick={() => navigateDate('next')}
                 className="p-1.5 rounded-xl border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 active:scale-95 cursor-pointer"
-                title="Mes siguiente"
+                title={`${navLabel.charAt(0).toUpperCase() + navLabel.slice(1)} siguiente`}
               >
                 <ChevronRight className="w-3.5 h-3.5" />
               </button>
             </div>
 
-            {!isCurrentMonth && (
+            {!isCurrent && (
               <button
                 type="button"
                 onClick={() => navigateDate('today')}
                 className="px-2 py-1 text-[11px] font-bold text-pink-600 dark:text-pink-300 bg-pink-50 dark:bg-pink-950/60 border border-pink-200 dark:border-pink-800/80 rounded-xl flex items-center gap-1 active:scale-95 cursor-pointer"
-                title="Volver al mes actual"
+                title="Volver a hoy"
               >
                 <span>↩</span>
                 <span>Hoy</span>

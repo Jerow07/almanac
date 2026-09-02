@@ -6,6 +6,7 @@ import {
   endOfMonth,
   eachDayOfInterval,
   isSameMonth,
+  isSameWeek,
   isSameDay,
   isToday,
   addMonths,
@@ -85,6 +86,23 @@ export const formatFriendlyDate = (dateStr: string): string => {
  */
 export const formatDateKey = (date: Date): string => {
   return format(date, 'yyyy-MM-dd');
+};
+
+/**
+ * Checks whether the currentDate matches the current period according to active view
+ */
+export const isCurrentPeriod = (
+  currentDate: Date,
+  view: 'month' | 'week' | 'year' | 'agenda'
+): boolean => {
+  const today = new Date();
+  if (view === 'week') {
+    return isSameWeek(currentDate, today, { weekStartsOn: 1 });
+  }
+  if (view === 'year') {
+    return currentDate.getFullYear() === today.getFullYear();
+  }
+  return isSameMonth(currentDate, today);
 };
 
 export const WEEK_DAYS_SELECTOR = [
