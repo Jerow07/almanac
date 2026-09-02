@@ -41,6 +41,24 @@ CREATE POLICY "Acceso total para Almanac" ON almanac_tasks
   TO anon, authenticated
   USING (true)
   WITH CHECK (true);
+
+-- Tabla para notificaciones push en segundo plano
+CREATE TABLE IF NOT EXISTS almanac_push_subscriptions (
+  id TEXT PRIMARY KEY,
+  user_id TEXT NOT NULL,
+  endpoint TEXT NOT NULL UNIQUE,
+  p256dh TEXT NOT NULL,
+  auth TEXT NOT NULL,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+ALTER TABLE almanac_push_subscriptions ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Acceso total subscripciones push" ON almanac_push_subscriptions
+  FOR ALL
+  TO anon, authenticated
+  USING (true)
+  WITH CHECK (true);
 `;
 
 export const CloudSyncModal: React.FC<CloudSyncModalProps> = ({ isOpen, onClose }) => {

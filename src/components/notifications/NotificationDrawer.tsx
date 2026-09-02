@@ -26,6 +26,35 @@ export const NotificationDrawer: React.FC<NotificationDrawerProps> = ({ isOpen, 
     clearNotifications,
   } = useNotification();
 
+  const [testingPush, setTestingPush] = React.useState(false);
+  const [testResult, setTestResult] = React.useState<string | null>(null);
+
+  const handleTestNotification = async () => {
+    setTestingPush(true);
+    setTestResult(null);
+    sounds.playNotification();
+
+    // 1. Show immediate local notification
+    notificationService.showSystemNotification('¡Prueba local de Almanac! 💖', {
+      body: 'Notificación instantánea en pantalla.',
+    });
+
+    // 2. Trigger real background Web Push to test Apple APNs / Google FCM
+    try {
+      const res = await notificationService.testBackgroundPush();
+      if (res.success) {
+        setTestResult('¡Push de fondo enviado con éxito! 🚀');
+      } else {
+        setTestResult(res.error || 'Aviso enviado');
+      }
+    } catch {
+      setTestResult('Aviso local enviado');
+    } finally {
+      setTestingPush(false);
+      setTimeout(() => setTestResult(null), 5000);
+    }
+  };
+
   if (!isOpen) return null;
 
   return createPortal(
@@ -224,29 +253,33 @@ export const NotificationDrawer: React.FC<NotificationDrawerProps> = ({ isOpen, 
         </div>
 
         {/* Footer with Test Button */}
-        <div className="p-2.5 bg-slate-50 dark:bg-slate-850 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between px-4">
-          <button
-            type="button"
-            onClick={() => {
-              notificationService.showSystemNotification('¡Prueba de Almanac! 💖', {
-                body: '¡Excelente! Las notificaciones en tu Android están funcionando.',
-              });
-              sounds.playNotification();
-            }}
-            className="text-xs font-bold text-pink-600 dark:text-pink-400 hover:text-pink-700 dark:hover:text-pink-300 cursor-pointer flex items-center gap-1 py-1 px-2 rounded-xl hover:bg-pink-50 dark:hover:bg-pink-950/40 transition-colors active:scale-95"
-            title="Enviar una notificación de prueba ahora"
-          >
-            <span>🔔</span>
-            <span>Probar notificación</span>
-          </button>
+        <div className="p-2.5 bg-slate-50 dark:bg-slate-850 border-t border-slate-100 dark:border-slate-800 flex flex-col gap-1.5 px-4">
+          <div className="flex items-center justify-between">
+            <button
+              type="button"
+              onClick={handleTestNotification}
+              disabled={testingPush}
+              className="text-xs font-bold text-pink-600 dark:text-pink-400 hover:text-pink-700 dark:hover:text-pink-300 cursor-pointer flex items-center gap-1.5 py-1 px-2.5 rounded-xl hover:bg-pink-50 dark:hover:bg-pink-950/40 transition-colors active:scale-95 disabled:opacity-50"
+              title="Prueba una notificación push real de fondo"
+            >
+              <span>{testingPush ? '⏳' : '🔔'}</span>
+              <span>{testingPush ? 'Enviando push...' : 'Probar notificación (Fondo)'}</span>
+            </button>
 
-          <button
-            type="button"
-            onClick={onClose}
-            className="text-xs font-semibold text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 py-1 px-3 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer"
-          >
-            Cerrar
-          </button>
+            <button
+              type="button"
+              onClick={onClose}
+              className="text-xs font-semibold text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 py-1 px-3 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer"
+            >
+              Cerrar
+            </button>
+          </div>
+
+          {testResult && (
+            <p className="text-[11px] text-center font-medium text-purple-600 dark:text-purple-400 bg-purple-50 dark:bg-purple-950/60 py-1 px-2 rounded-lg animate-in fade-in">
+              {testResult}
+            </p>
+          )}
         </div>
       </div>
     </>,

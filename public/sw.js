@@ -24,12 +24,12 @@ self.addEventListener('push', (event) => {
     }
   }
 
-  const title = data.title || 'Recordatorio de Almanac 💖';
+  const title = data.title || 'Almanac 💖';
   const options = {
-    body: data.message || 'Tienes una tarea o plan programado.',
+    body: data.body || data.message || 'Tienes una tarea o plan programado.',
     icon: '/icon-192.png',
     badge: '/icon-192.png',
-    tag: data.taskId || 'almanac-reminder',
+    tag: data.tag || data.taskId || 'almanac-reminder',
     data: data,
     vibrate: [200, 100, 200]
   };

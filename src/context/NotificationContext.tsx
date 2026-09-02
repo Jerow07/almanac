@@ -180,10 +180,18 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
     return () => window.removeEventListener('almanac:partner-action', handlePartnerAction);
   }, [currentUser, notificationsEnabled]);
 
+  // Ensure push subscription is registered for this user
+  useEffect(() => {
+    if (permissionStatus === 'granted') {
+      notificationService.subscribeToPush(currentUser);
+    }
+  }, [currentUser, permissionStatus]);
+
   const requestPermission = async () => {
     const status = await notificationService.requestPermission();
     setPermissionStatus(status);
     if (status === 'granted') {
+      await notificationService.subscribeToPush(currentUser);
       notificationService.showSystemNotification('¡Notificaciones activadas en Almanac! 💖', {
         body: 'Te avisaremos a ti y a Zahria antes de cada tarea y cuando agreguen planes.',
       });

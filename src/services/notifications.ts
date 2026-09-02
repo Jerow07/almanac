@@ -1,6 +1,23 @@
 import { Task } from '../types';
 import { sounds } from '../utils/sound';
 import { isTaskOnDate, formatDateKey } from '../utils/dateUtils';
+import { getStoredCloudConfig, getSupabase } from './supabase';
+
+export const VAPID_PUBLIC_KEY =
+  'BAUfOu3xA1LAVmZFr87Rei6JQYmVWYqGttyYD4O41InKrVO146DOyMCtXN0sO_ClT2_OcNw4iclQYiKTymwc0To';
+
+function urlBase64ToUint8Array(base64String: string): Uint8Array {
+  const padding = '='.repeat((4 - (base64String.length % 4)) % 4);
+  const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
+
+  const rawData = window.atob(base64);
+  const outputArray = new Uint8Array(rawData.length);
+
+  for (let i = 0; i < rawData.length; ++i) {
+    outputArray[i] = rawData.charCodeAt(i);
+  }
+  return outputArray;
+}
 
 export interface AppNotification {
   id: string;
@@ -202,6 +219,148 @@ class NotificationService {
     });
 
     return newAlerts;
+  }
+
+  /**
+   * Subscribe this device to Background Web Push (Google FCM & Apple APNs)
+   */
+  public async subscribeToPush(user: 'jeronimo' | 'zahria'): Promise<PushSubscription | null> {
+    if (typeof window === 'undefined' || !('serviceWorker' in navigator)) {
+      return null;
+    }
+
+    try {
+      const reg = this.swRegistration || (await navigator.serviceWorker.ready);
+      if (!('pushManager' in reg)) {
+        return null;
+      }
+
+      let sub = await reg.pushManager.getSubscription();
+
+      if (!sub) {
+        sub = await reg.pushManager.subscribe({
+          userVisibleOnly: true,
+          applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY) as unknown as BufferSource,
+        });
+      }
+
+      const config = getStoredCloudConfig();
+
+      // Post to Vercel serverless endpoint
+      try {
+        await fetch('/api/subscribe', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            user,
+            subscription: sub.toJSON(),
+            supabaseUrl: config?.url,
+            supabaseAnonKey: config?.anonKey,
+          }),
+        });
+      } catch (err) {
+        console.warn('Could not post to /api/subscribe:', err);
+      }
+
+      // Also upsert directly into Supabase if client is connected
+      const supabase = getSupabase();
+      if (supabase && sub) {
+        const subJson = sub.toJSON();
+        const subId = `${user}_${btoa(sub.endpoint).replace(/[^a-zA-Z0-9]/g, '').slice(-32)}`;
+        try {
+          await supabase.from('almanac_push_subscriptions').upsert(
+            {
+              id: subId,
+              user_id: user,
+              endpoint: sub.endpoint,
+              p256dh: subJson.keys?.p256dh,
+              auth: subJson.keys?.auth,
+              updated_at: new Date().toISOString(),
+            },
+            { onConflict: 'endpoint' }
+          );
+        } catch {
+          // Table might not exist yet
+        }
+      }
+
+      return sub;
+    } catch (err) {
+      console.warn('subscribeToPush error:', err);
+      return null;
+    }
+  }
+
+  /**
+   * Send background push to partner device (wakes up phone when app is closed)
+   */
+  public async sendPushToPartner(
+    targetUser: 'jeronimo' | 'zahria' | 'both',
+    title: string,
+    body: string,
+    tag?: string
+  ): Promise<void> {
+    const config = getStoredCloudConfig();
+    if (!config?.url || !config?.anonKey) {
+      return;
+    }
+
+    try {
+      await fetch('/api/send-push', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          targetUser,
+          title,
+          body,
+          tag: tag || 'almanac-update',
+          supabaseUrl: config.url,
+          supabaseAnonKey: config.anonKey,
+        }),
+      });
+    } catch (err) {
+      console.warn('sendPushToPartner error:', err);
+    }
+  }
+
+  /**
+   * Test background Web Push directly to this device
+   */
+  public async testBackgroundPush(): Promise<{ success: boolean; error?: string }> {
+    if (typeof window === 'undefined' || !('serviceWorker' in navigator)) {
+      return { success: false, error: 'Service Worker no soportado' };
+    }
+
+    try {
+      const reg = this.swRegistration || (await navigator.serviceWorker.ready);
+      if (!('pushManager' in reg)) {
+        return { success: false, error: 'Push Manager no soportado en este navegador' };
+      }
+
+      let sub = await reg.pushManager.getSubscription();
+      if (!sub) {
+        sub = await reg.pushManager.subscribe({
+          userVisibleOnly: true,
+          applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY) as unknown as BufferSource,
+        });
+      }
+
+      const res = await fetch('/api/send-push', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          directSubscription: sub.toJSON(),
+          title: '¡Push de Fondo Exitoso! 💖',
+          body: 'Esta notificación llega incluso con la app cerrada y el teléfono bloqueado.',
+          tag: 'test-push',
+        }),
+      });
+
+      const json = await res.json();
+      return { success: Boolean(json.success), error: json.error };
+    } catch (err: any) {
+      return { success: false, error: err?.message || 'Error al enviar push' };
+    }
   }
 
   private saveNotifiedKeys() {

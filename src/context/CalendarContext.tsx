@@ -9,6 +9,7 @@ import {
   mapDbToTask,
   getStoredCloudConfig
 } from '../services/supabase';
+import { notificationService } from '../services/notifications';
 import {
   addMonths,
   subMonths,
@@ -212,6 +213,17 @@ export const CalendarProvider: React.FC<{ children: React.ReactNode }> = ({ chil
 
     // Push to Supabase if connected
     supabaseSync.upsertTask(newTask);
+
+    // Send Background Web Push to partner (wakes up phone if app is closed)
+    const targetPartner = currentUser === 'jeronimo' ? 'zahria' : 'jeronimo';
+    const partnerName = currentUser === 'jeronimo' ? 'Jerónimo' : 'Zahria';
+    let pushTitle = `¡${partnerName} agregó un plan! 💖`;
+    if (newTask.assignee === targetPartner) {
+      pushTitle = `¡${partnerName} te asignó una tarea! 📌`;
+    } else if (newTask.assignee === 'both') {
+      pushTitle = `¡${partnerName} agregó un plan juntos! 💑`;
+    }
+    notificationService.sendPushToPartner(targetPartner, pushTitle, newTask.title, newTask.id);
   };
 
   const updateTask = (id: string, updates: Partial<Task>) => {
@@ -270,6 +282,19 @@ export const CalendarProvider: React.FC<{ children: React.ReactNode }> = ({ chil
 
     if (targetTask) {
       supabaseSync.upsertTask(targetTask);
+
+      // Send Background Web Push to partner if marked as completed
+      if ((targetTask as Task).completed) {
+        const targetPartner = currentUser === 'jeronimo' ? 'zahria' : 'jeronimo';
+        const partnerName = currentUser === 'jeronimo' ? 'Jerónimo' : 'Zahria';
+        let pushTitle = `¡${partnerName} completó una tarea! 👏`;
+        if ((targetTask as Task).assignee === targetPartner) {
+          pushTitle = `¡${partnerName} completó tu tarea! 💖`;
+        } else if ((targetTask as Task).assignee === 'both') {
+          pushTitle = `¡${partnerName} completó el plan juntos! 💑`;
+        }
+        notificationService.sendPushToPartner(targetPartner, pushTitle, (targetTask as Task).title, (targetTask as Task).id);
+      }
     }
   };
 
