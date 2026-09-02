@@ -96,8 +96,9 @@ class NotificationService {
     }
 
     const notifOptions: NotificationOptions = {
-      icon: '/calendar-heart.svg',
-      badge: '/calendar-heart.svg',
+      icon: '/icon-192.png',
+      badge: '/icon-192.png',
+      ...({ vibrate: [200, 100, 200] } as any),
       ...options,
     };
 

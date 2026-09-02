@@ -1,6 +1,8 @@
 import React from 'react';
 import { createPortal } from 'react-dom';
 import { useNotification } from '../../context/NotificationContext';
+import { notificationService } from '../../services/notifications';
+import { sounds } from '../../utils/sound';
 import { Bell, Check, Trash2, BellRing, BellOff } from 'lucide-react';
 import { formatDistanceToNow, parseISO } from 'date-fns';
 import { es } from 'date-fns/locale';
@@ -15,6 +17,9 @@ export const NotificationDrawer: React.FC<NotificationDrawerProps> = ({ isOpen, 
     notifications,
     notificationsEnabled,
     toggleNotificationsEnabled,
+    permissionStatus,
+    isSupported,
+    requestPermission,
     markAsRead,
     markAllAsRead,
     clearNotifications,
@@ -110,8 +115,38 @@ export const NotificationDrawer: React.FC<NotificationDrawerProps> = ({ isOpen, 
           </button>
         </div>
 
+        {/* Permission Prompt for Android if not yet granted */}
+        {isSupported && permissionStatus === 'default' && (
+          <div className="p-3 bg-pink-50/80 border-b border-pink-100 flex items-center justify-between gap-2 text-xs">
+            <div>
+              <p className="font-bold text-pink-900">🔔 Activar avisos en Android</p>
+              <p className="text-[11px] text-pink-700">Toca aquí para autorizar alertas</p>
+            </div>
+            <button
+              type="button"
+              onClick={requestPermission}
+              className="px-3 py-1.5 bg-pink-600 hover:bg-pink-700 text-white rounded-xl font-bold text-xs shadow-sm cursor-pointer flex-shrink-0 active:scale-95"
+            >
+              Permitir
+            </button>
+          </div>
+        )}
+
+        {/* Permission Denied Guide for Android */}
+        {isSupported && permissionStatus === 'denied' && (
+          <div className="p-3 bg-rose-50 border-b border-rose-100 text-xs">
+            <p className="font-bold text-rose-800 flex items-center gap-1">
+              <span>⚠️</span>
+              <span>Notificaciones bloqueadas en Android</span>
+            </p>
+            <p className="text-[11px] text-rose-700 mt-1 leading-relaxed">
+              Tu teléfono tiene las notificaciones desactivadas para Almanac. Para recibirlas: mantén presionado el ícono de <strong>Almanac</strong> en el celular ➔ <strong>Info de la app (ⓘ)</strong> ➔ <strong>Notificaciones</strong> ➔ <strong>Permitir</strong>.
+            </p>
+          </div>
+        )}
+
         {/* Notifications List */}
-        <div className="divide-y divide-slate-100 overflow-y-auto flex-1 max-h-[350px]">
+        <div className="divide-y divide-slate-100 overflow-y-auto flex-1 max-h-[320px]">
           {notifications.length === 0 ? (
             <div className="p-8 text-center text-slate-400">
               <Bell className="w-8 h-8 mx-auto mb-2 text-slate-300 opacity-60" />
@@ -170,12 +205,27 @@ export const NotificationDrawer: React.FC<NotificationDrawerProps> = ({ isOpen, 
           )}
         </div>
 
-        {/* Footer */}
-        <div className="p-2.5 bg-slate-50 border-t border-slate-100 text-center">
+        {/* Footer with Test Button */}
+        <div className="p-2.5 bg-slate-50 border-t border-slate-100 flex items-center justify-between px-4">
+          <button
+            type="button"
+            onClick={() => {
+              notificationService.showSystemNotification('¡Prueba de Almanac! 💖', {
+                body: '¡Excelente! Las notificaciones en tu Android están funcionando.',
+              });
+              sounds.playNotification();
+            }}
+            className="text-xs font-bold text-pink-600 hover:text-pink-700 cursor-pointer flex items-center gap-1 py-1 px-2 rounded-xl hover:bg-pink-50 transition-colors active:scale-95"
+            title="Enviar una notificación de prueba ahora"
+          >
+            <span>🔔</span>
+            <span>Probar notificación</span>
+          </button>
+
           <button
             type="button"
             onClick={onClose}
-            className="text-xs font-semibold text-slate-500 hover:text-slate-700 py-1 px-4 rounded-xl hover:bg-slate-100 cursor-pointer"
+            className="text-xs font-semibold text-slate-500 hover:text-slate-700 py-1 px-3 rounded-xl hover:bg-slate-100 cursor-pointer"
           >
             Cerrar
           </button>
