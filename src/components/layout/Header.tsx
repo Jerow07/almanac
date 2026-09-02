@@ -64,7 +64,7 @@ export const Header: React.FC = () => {
   };
 
   return (
-    <header ref={headerRef} className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-pink-100/70 shadow-xs transition-all w-full max-w-full overflow-hidden">
+    <header ref={headerRef} className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-pink-100/70 shadow-xs transition-all w-full max-w-full">
       <div className="max-w-7xl mx-auto px-3 sm:px-6 py-2.5 sm:py-3 w-full">
         {/* Top row */}
         <div className="flex items-center justify-between gap-1.5 sm:gap-3 w-full">
