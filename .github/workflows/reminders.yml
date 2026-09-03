@@ -14,4 +14,4 @@ jobs:
       - name: Ping Almanac Reminders Endpoint
         run: |
           echo "Pinging Almanac check-reminders endpoint..."
-          curl -s -X GET "https://almanac-six.vercel.app/api/check-reminders" | grep -v '^$' || true
+          curl -s -X GET "https://almanac-wine.vercel.app/api/check-reminders" | grep -v '^$' || true
