@@ -25,12 +25,12 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: 'Missing required subscription fields' });
     }
 
-    const url = supabaseUrl || process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL;
-    const anonKey = supabaseAnonKey || process.env.SUPABASE_ANON_KEY || process.env.VITE_SUPABASE_ANON_KEY;
+    const DEFAULT_SUPABASE_URL = 'https://exxzytflpmmbwoshugrh.supabase.co';
+    const DEFAULT_SUPABASE_ANON_KEY =
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV4eHp5dGZscG1tYndvc2h1Z3JoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg3MTgzMjMsImV4cCI6MjA5NDI5NDMyM30.qzrt58EbPLMUZnovpjF8igwrobRtB13YnIQNUbUO_2U';
 
-    if (!url || !anonKey) {
-      return res.status(400).json({ error: 'Supabase credentials not provided' });
-    }
+    const url = supabaseUrl || process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL || DEFAULT_SUPABASE_URL;
+    const anonKey = supabaseAnonKey || process.env.SUPABASE_ANON_KEY || process.env.VITE_SUPABASE_ANON_KEY || DEFAULT_SUPABASE_ANON_KEY;
 
     const supabase = createClient(url, anonKey);
 

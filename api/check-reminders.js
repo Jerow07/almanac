@@ -17,6 +17,77 @@ const DEFAULT_SUPABASE_ANON_KEY =
 // Fallback in-memory cache to prevent duplicate alerts if table not yet created
 const inMemorySentKeys = new Set();
 
+function parseTask(row) {
+  let startTime = undefined;
+  let endTime = undefined;
+  if (row.time && typeof row.time === 'string') {
+    if (row.time.includes(' - ')) {
+      const parts = row.time.split(' - ');
+      startTime = parts[0]?.trim();
+      endTime = parts[1]?.trim();
+    } else {
+      startTime = row.time.trim();
+    }
+  }
+
+  let recurrence = 'none';
+  let recurrenceDays = undefined;
+  if (row.recurrence && typeof row.recurrence === 'string') {
+    if (row.recurrence.startsWith('weekly:')) {
+      recurrence = 'weekly';
+      recurrenceDays = row.recurrence
+        .replace('weekly:', '')
+        .split(',')
+        .map((d) => parseInt(d, 10))
+        .filter((n) => !isNaN(n));
+    } else if (['daily', 'weekly', 'monthly', 'yearly'].includes(row.recurrence)) {
+      recurrence = row.recurrence;
+    }
+  }
+
+  return {
+    id: row.id,
+    title: row.title,
+    date: row.date,
+    time: startTime,
+    endTime,
+    allDay: Boolean(row.all_day),
+    assignee: row.assignee,
+    completed: Boolean(row.completed),
+    recurrence,
+    recurrenceDays,
+    reminder: row.reminder || 'none',
+  };
+}
+
+function isTaskOnDate(task, targetDateKey, targetDayOfWeek, targetDayOfMonth, targetMonth) {
+  if (targetDateKey < task.date) return false;
+  if (targetDateKey === task.date) return true;
+
+  if (!task.recurrence || task.recurrence === 'none') return false;
+  if (task.recurrence === 'daily') return true;
+
+  if (task.recurrence === 'weekly') {
+    if (task.recurrenceDays && task.recurrenceDays.length > 0) {
+      return task.recurrenceDays.includes(targetDayOfWeek);
+    }
+    const taskStart = new Date(task.date + 'T12:00:00Z');
+    return taskStart.getUTCDay() === targetDayOfWeek;
+  }
+
+  if (task.recurrence === 'monthly') {
+    const taskStart = new Date(task.date + 'T12:00:00Z');
+    return taskStart.getUTCDate() === targetDayOfMonth;
+  }
+
+  if (task.recurrence === 'yearly') {
+    const taskStart = new Date(task.date + 'T12:00:00Z');
+    return taskStart.getUTCMonth() === targetMonth && taskStart.getUTCDate() === targetDayOfMonth;
+  }
+
+  return false;
+}
+
 export default async function handler(req, res) {
   // CORS headers
   res.setHeader('Access-Control-Allow-Credentials', true);
@@ -58,9 +129,9 @@ export default async function handler(req, res) {
       return res.status(500).json({ error: tasksError.message });
     }
 
-    const tasks = (rawTasks || []).filter(
-      (t) => t.reminder && t.reminder !== 'none'
-    );
+    const tasks = (rawTasks || [])
+      .map(parseTask)
+      .filter((t) => t.reminder && t.reminder !== 'none');
 
     if (tasks.length === 0) {
       return res.status(200).json({
@@ -78,7 +149,8 @@ export default async function handler(req, res) {
     if (!subscriptions || subscriptions.length === 0) {
       return res.status(200).json({
         success: true,
-        message: 'No push subscriptions found to deliver reminders.',
+        message: 'No push subscriptions found in database.',
+        tasksChecked: tasks.length,
         sent: 0,
       });
     }
@@ -98,43 +170,47 @@ export default async function handler(req, res) {
 
     // Current date and time in Argentina (UTC-3)
     const now = new Date();
-    // Argentina offset is -3 hours (-180 minutes)
-    const argentinaOffsetMs = -3 * 60 * 60 * 1000;
-    const nowArgentina = new Date(now.getTime() + argentinaOffsetMs + now.getTimezoneOffset() * 60 * 1000);
-    const todayStr = nowArgentina.toISOString().split('T')[0];
-    const currentDayOfWeek = nowArgentina.getDay(); // 0 Sun ... 6 Sat
+    // Argentina is UTC-3 all year
+    const argentinaNow = new Date(now.getTime() - 3 * 3600 * 1000);
+    const todayStr = argentinaNow.toISOString().split('T')[0];
+    const currentDayOfWeek = argentinaNow.getUTCDay(); // 0 Sun ... 6 Sat
+    const currentDayOfMonth = argentinaNow.getUTCDate();
+    const currentMonth = argentinaNow.getUTCMonth();
 
     const remindersToSend = [];
+    const debugTaskStatus = [];
 
-    tasks.forEach((task) => {
-      // Recurrence check
-      let occursToday = false;
-      if (task.date === todayStr) {
-        occursToday = true;
-      } else if (task.recurrence && task.recurrence !== 'none' && todayStr >= task.date) {
-        if (task.recurrence === 'daily') {
-          occursToday = true;
-        } else if (task.recurrence === 'weekly') {
-          if (task.recurrence_days && Array.isArray(task.recurrence_days) && task.recurrence_days.length > 0) {
-            occursToday = task.recurrence_days.includes(currentDayOfWeek);
-          } else {
-            const taskStart = new Date(task.date + 'T12:00:00Z');
-            occursToday = taskStart.getDay() === currentDayOfWeek;
-          }
-        } else if (task.recurrence === 'monthly') {
-          occursToday = todayStr.slice(-2) === task.date.slice(-2);
-        }
+    for (const task of tasks) {
+      const occursToday = isTaskOnDate(
+        task,
+        todayStr,
+        currentDayOfWeek,
+        currentDayOfMonth,
+        currentMonth
+      );
+
+      if (!occursToday) {
+        debugTaskStatus.push({ id: task.id, title: task.title, occursToday: false });
+        continue;
       }
 
-      if (!occursToday) return;
-
       const reminderKey = `${task.id}_${todayStr}_${task.reminder}`;
-      if (sentKeys.has(reminderKey)) return;
+      const alreadySent = sentKeys.has(reminderKey);
 
-      // Calculate reminder datetime in Argentina time
-      const taskTime = task.time || '09:00';
-      const [hours, minutes] = taskTime.split(':').map(Number);
-      const taskDateTime = new Date(nowArgentina.getFullYear(), nowArgentina.getMonth(), nowArgentina.getDate(), hours, minutes, 0);
+      // Parse start time (e.g. "18:00")
+      const startTime = task.time || '09:00';
+      const timeParts = startTime.split(':');
+      const hours = parseInt(timeParts[0], 10);
+      const minutes = parseInt(timeParts[1] || '0', 10);
+
+      if (isNaN(hours) || isNaN(minutes)) {
+        debugTaskStatus.push({ id: task.id, title: task.title, error: 'Invalid time format: ' + startTime });
+        continue;
+      }
+
+      // Explicit Argentina timezone offset (-03:00) gives deterministic UTC timestamp
+      const isoArgentina = `${todayStr}T${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:00-03:00`;
+      const taskTargetTimeMs = new Date(isoArgentina).getTime();
 
       let reminderOffsetMs = 0;
       let label = 'A la hora programada';
@@ -162,25 +238,41 @@ export default async function handler(req, res) {
           break;
       }
 
-      const reminderDateTime = new Date(taskDateTime.getTime() - reminderOffsetMs);
-      const diffMs = nowArgentina.getTime() - reminderDateTime.getTime();
+      const reminderTimeMs = taskTargetTimeMs - reminderOffsetMs;
+      const diffMs = now.getTime() - reminderTimeMs;
+      const diffMinutes = Math.round(diffMs / 60000);
 
-      // Trigger if we are at or past reminder time, but within a 2-hour window and before task finishes
-      if (diffMs >= 0 && diffMs <= 2 * 60 * 60 * 1000) {
+      const isDue = diffMs >= 0 && diffMs <= 2 * 60 * 60 * 1000;
+
+      debugTaskStatus.push({
+        id: task.id,
+        title: task.title,
+        startTime,
+        occursToday: true,
+        reminder: task.reminder,
+        diffMinutes,
+        isDue,
+        alreadySent,
+      });
+
+      if (isDue && !alreadySent) {
         remindersToSend.push({
           task,
           reminderKey,
           label,
-          taskTime,
+          startTime,
         });
       }
-    });
+    }
 
     if (remindersToSend.length === 0) {
       return res.status(200).json({
         success: true,
         message: 'No tasks due for reminder at this moment.',
+        todayStr,
         checkedCount: tasks.length,
+        subscriptionsCount: subscriptions.length,
+        taskStatus: debugTaskStatus,
         sent: 0,
       });
     }
@@ -188,17 +280,24 @@ export default async function handler(req, res) {
     let totalPushesSent = 0;
 
     for (const item of remindersToSend) {
-      const { task, reminderKey, label, taskTime } = item;
+      const { task, reminderKey, label, startTime } = item;
 
       // Filter target subscribers
-      const targetSubs = subscriptions.filter((sub) => {
+      let targetSubs = subscriptions.filter((sub) => {
         if (task.assignee === 'both') return true;
         return sub.user_id === task.assignee || sub.user_id === 'both';
       });
 
+      // Fallback: If no matching user, send to all subscriptions to guarantee delivery
+      if (targetSubs.length === 0) {
+        targetSubs = subscriptions;
+      }
+
       const pushPayload = JSON.stringify({
         title: `⏰ ${label}: ${task.title}`,
-        body: task.time ? `Programado a las ${taskTime} hs.` : `Plan para hoy: ${task.title}`,
+        body: task.time
+          ? `Programado a las ${startTime} hs.`
+          : `Plan para hoy: ${task.title}`,
         tag: `reminder-${task.id}`,
         data: { taskId: task.id },
       });
@@ -217,12 +316,15 @@ export default async function handler(req, res) {
           totalPushesSent++;
         } catch (err) {
           if (err.statusCode === 410 || err.statusCode === 404) {
-            await supabase.from('almanac_push_subscriptions').delete().eq('endpoint', sub.endpoint);
+            await supabase
+              .from('almanac_push_subscriptions')
+              .delete()
+              .eq('endpoint', sub.endpoint);
           }
         }
       }
 
-      // Mark as notified
+      // Mark as notified in memory and DB
       inMemorySentKeys.add(reminderKey);
       try {
         await supabase.from('almanac_reminders_sent').upsert(
@@ -243,6 +345,7 @@ export default async function handler(req, res) {
       remindersProcessed: remindersToSend.length,
       totalPushesSent,
       sentReminders: remindersToSend.map((r) => r.reminderKey),
+      taskStatus: debugTaskStatus,
     });
   } catch (err) {
     console.error('Check reminders error:', err);
