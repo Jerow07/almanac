@@ -158,9 +158,10 @@ class NotificationService {
       if (task.completed || task.reminder === 'none') return;
       if (!isTaskOnDate(task, now)) return;
 
-      // Determine task trigger datetime for today
-      const taskTime = task.time || '09:00';
-      const taskDateTime = new Date(`${todayStr}T${taskTime}:00`);
+      // Determine task trigger datetime for today (only start time, ignoring any end time)
+      const rawTime = task.time || '09:00';
+      const startTime = rawTime.includes(' - ') ? rawTime.split(' - ')[0].trim() : rawTime.trim();
+      const taskDateTime = new Date(`${todayStr}T${startTime}:00`);
 
       if (isNaN(taskDateTime.getTime())) return;
 
