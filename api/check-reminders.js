@@ -155,15 +155,26 @@ export default async function handler(req, res) {
       });
     }
 
-    // 3. Fetch already sent reminders
+    // 3. Fetch already sent reminders (only last 3 days so the query is always ultra-fast)
+    const threeDaysAgoIso = new Date(Date.now() - 3 * 24 * 3600 * 1000).toISOString();
     let sentKeys = new Set(inMemorySentKeys);
     try {
       const { data: sentDb } = await supabase
         .from('almanac_reminders_sent')
-        .select('id');
+        .select('id')
+        .gte('reminded_at', threeDaysAgoIso);
       if (sentDb) {
         sentDb.forEach((row) => sentKeys.add(row.id));
       }
+
+      // Auto-cleanup: purge records older than 14 days in background so table stays tiny forever
+      const fourteenDaysAgoIso = new Date(Date.now() - 14 * 24 * 3600 * 1000).toISOString();
+      supabase
+        .from('almanac_reminders_sent')
+        .delete()
+        .lt('reminded_at', fourteenDaysAgoIso)
+        .then(() => {})
+        .catch(() => {});
     } catch {
       // Table might not exist yet
     }
