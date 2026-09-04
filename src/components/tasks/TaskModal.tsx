@@ -255,15 +255,27 @@ export const TaskModal: React.FC = () => {
                       <Clock className="w-3 h-3 text-slate-400 absolute left-2 top-2.5 sm:top-3 pointer-events-none" />
                     </div>
                     <span className="text-slate-400 dark:text-slate-500 text-xs font-bold flex-shrink-0">a</span>
-                    <div className="relative min-w-0 flex-1">
-                      <input
-                        type="time"
-                        value={endTime}
-                        onChange={(e) => setEndTime(e.target.value)}
-                        className="w-full pl-6 sm:pl-7 pr-1 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-pink-400 text-xs sm:text-sm"
-                        title="Hora de fin (opcional)"
-                      />
-                      <Clock className="w-3 h-3 text-slate-400 absolute left-2 top-2.5 sm:top-3 pointer-events-none" />
+                    <div className="flex items-center gap-1 min-w-0 flex-1">
+                      <div className="relative min-w-0 flex-1">
+                        <input
+                          type="time"
+                          value={endTime}
+                          onChange={(e) => setEndTime(e.target.value)}
+                          className="w-full pl-6 sm:pl-7 pr-1 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-pink-400 text-xs sm:text-sm"
+                          title="Hora de fin (opcional)"
+                        />
+                        <Clock className="w-3 h-3 text-slate-400 absolute left-2 top-2.5 sm:top-3 pointer-events-none" />
+                      </div>
+                      {endTime && (
+                        <button
+                          type="button"
+                          onClick={() => setEndTime('')}
+                          className="p-1.5 rounded-lg text-slate-400 hover:text-rose-500 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors flex-shrink-0"
+                          title="Quitar hora de fin"
+                        >
+                          <X className="w-3.5 h-3.5" />
+                        </button>
+                      )}
                     </div>
                   </div>
                   <p className="text-[10px] text-slate-400 dark:text-slate-500 text-right">
