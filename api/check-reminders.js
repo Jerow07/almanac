@@ -205,9 +205,6 @@ export default async function handler(req, res) {
         continue;
       }
 
-      const reminderKey = `${task.id}_${todayStr}_${task.reminder}`;
-      const alreadySent = sentKeys.has(reminderKey);
-
       // Parse start time (e.g. "18:00")
       const startTime = task.time || '09:00';
       const timeParts = startTime.split(':');
@@ -218,6 +215,9 @@ export default async function handler(req, res) {
         debugTaskStatus.push({ id: task.id, title: task.title, error: 'Invalid time format: ' + startTime });
         continue;
       }
+
+      const reminderKey = `${task.id}_${todayStr}_${startTime}_${task.reminder}`;
+      const alreadySent = sentKeys.has(reminderKey);
 
       // Explicit Argentina timezone offset (-03:00) gives deterministic UTC timestamp
       const isoArgentina = `${todayStr}T${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:00-03:00`;

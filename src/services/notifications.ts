@@ -201,7 +201,7 @@ class NotificationService {
       // Only alert if the reminder is occurring right now (within 75 seconds)
       // Never retroactively for past events when opening the app minutes later!
       const diffMs = now.getTime() - reminderTime.getTime();
-      const notificationKey = `${task.id}_${todayStr}_${task.reminder}`;
+      const notificationKey = `${task.id}_${todayStr}_${startTime}_${task.reminder}`;
 
       if (diffMs >= 0 && diffMs <= 75 * 1000) {
         if (!this.notifiedTaskIds.has(notificationKey)) {
