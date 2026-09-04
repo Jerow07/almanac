@@ -47,10 +47,12 @@ export default async function handler(req, res) {
       data: data || {},
     });
 
+    const pushOptions = { TTL: 3600, urgency: 'high' };
+
     // 1. Direct Push (Immediate Test Push without DB query)
     if (directSubscription && directSubscription.endpoint) {
       try {
-        await webpush.sendNotification(directSubscription, payload);
+        await webpush.sendNotification(directSubscription, payload, pushOptions);
         return res.status(200).json({ success: true, direct: true });
       } catch (err) {
         console.warn('Direct push failed:', err.statusCode, err.message);
@@ -112,7 +114,7 @@ export default async function handler(req, res) {
         };
 
         try {
-          await webpush.sendNotification(pushSub, payload);
+          await webpush.sendNotification(pushSub, payload, pushOptions);
           sentCount++;
         } catch (err) {
           // 404 or 410 means subscription expired or uninstalled -> clean up

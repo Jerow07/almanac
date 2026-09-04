@@ -322,8 +322,13 @@ export default async function handler(req, res) {
           },
         };
 
+        const pushOptions = {
+          TTL: 3600,
+          urgency: 'high',
+        };
+
         try {
-          await webpush.sendNotification(pushSub, pushPayload);
+          await webpush.sendNotification(pushSub, pushPayload, pushOptions);
           totalPushesSent++;
         } catch (err) {
           if (err.statusCode === 410 || err.statusCode === 404) {
