@@ -64,13 +64,6 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
       notificationService.checkTaskReminders(tasks, (newAlert) => {
         setNotifications((prev) => [newAlert, ...prev].slice(0, 25));
       });
-
-      // Also ping cloud reminders endpoint
-      try {
-        fetch('/api/check-reminders').catch(() => {});
-      } catch {
-        // ignore
-      }
     };
 
     check();

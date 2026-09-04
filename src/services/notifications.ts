@@ -49,6 +49,23 @@ class NotificationService {
     }
 
     this.registerServiceWorker();
+    this.syncSentRemindersFromCloud();
+  }
+
+  public async syncSentRemindersFromCloud() {
+    try {
+      const supabase = getSupabase();
+      if (!supabase) return;
+      const { data } = await supabase.from('almanac_reminders_sent').select('id');
+      if (data) {
+        data.forEach((row) => {
+          if (row.id) this.notifiedTaskIds.add(row.id);
+        });
+        this.saveNotifiedKeys();
+      }
+    } catch {
+      // ignore
+    }
   }
 
   public setEnabled(enabled: boolean) {
@@ -181,14 +198,32 @@ class NotificationService {
           break;
       }
 
-      // If reminder time has passed within the last 2 hours and hasn't been notified yet
+      // Only alert if the reminder is occurring right now (within 75 seconds)
+      // Never retroactively for past events when opening the app minutes later!
       const diffMs = now.getTime() - reminderTime.getTime();
       const notificationKey = `${task.id}_${todayStr}_${task.reminder}`;
 
-      if (diffMs >= 0 && diffMs <= 2 * 60 * 60 * 1000) {
+      if (diffMs >= 0 && diffMs <= 75 * 1000) {
         if (!this.notifiedTaskIds.has(notificationKey)) {
           this.notifiedTaskIds.add(notificationKey);
           this.saveNotifiedKeys();
+
+          // Sync with cloud so background checker knows it was handled
+          try {
+            const supabase = getSupabase();
+            if (supabase) {
+              supabase
+                .from('almanac_reminders_sent')
+                .upsert({
+                  id: notificationKey,
+                  task_id: task.id,
+                  reminded_at: new Date().toISOString(),
+                })
+                .then(() => {}, () => {});
+            }
+          } catch {
+            // ignore
+          }
 
           const alertObj: AppNotification = {
             id: 'notif_' + Math.random().toString(36).substring(2, 9),
