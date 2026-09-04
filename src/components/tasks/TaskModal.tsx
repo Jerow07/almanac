@@ -227,9 +227,22 @@ export const TaskModal: React.FC = () => {
 
             <div className="sm:col-span-7">
               <div className="flex items-center justify-between mb-1">
-                <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 uppercase tracking-wider">
-                  Horario
-                </label>
+                <div className="flex items-center gap-2">
+                  <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 uppercase tracking-wider">
+                    Horario
+                  </label>
+                  {!allDay && endTime && (
+                    <button
+                      type="button"
+                      onClick={() => setEndTime('')}
+                      className="inline-flex items-center gap-1 text-[11px] font-medium text-rose-500 hover:text-rose-600 dark:text-rose-400 dark:hover:text-rose-300 hover:underline transition-all cursor-pointer"
+                      title="Quitar hora de fin"
+                    >
+                      <X className="w-3 h-3" />
+                      <span>Quitar fin</span>
+                    </button>
+                  )}
+                </div>
                 <label className="inline-flex items-center gap-1.5 cursor-pointer text-xs text-slate-500 dark:text-slate-400 font-medium">
                   <input
                     type="checkbox"
@@ -255,28 +268,15 @@ export const TaskModal: React.FC = () => {
                       <Clock className="w-3 h-3 text-slate-400 absolute left-2 top-2.5 sm:top-3 pointer-events-none" />
                     </div>
                     <span className="text-slate-400 dark:text-slate-500 text-xs font-bold flex-shrink-0">a</span>
-                    <div className="flex items-center gap-2 min-w-0 flex-1">
-                      <div className="relative min-w-0 flex-1">
-                        <input
-                          type="time"
-                          value={endTime}
-                          onChange={(e) => setEndTime(e.target.value)}
-                          className="w-full pl-6 sm:pl-7 pr-1 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-pink-400 text-xs sm:text-sm"
-                          title="Hora de fin (opcional)"
-                        />
-                        <Clock className="w-3 h-3 text-slate-400 absolute left-2 top-2.5 sm:top-3 pointer-events-none" />
-                      </div>
-                      {endTime && (
-                        <button
-                          type="button"
-                          onClick={() => setEndTime('')}
-                          className="w-8 h-8 rounded-full flex items-center justify-center bg-slate-100 hover:bg-rose-50 dark:bg-slate-800 dark:hover:bg-rose-950/40 text-slate-400 hover:text-rose-500 border border-slate-200 dark:border-slate-700 shadow-xs transition-all flex-shrink-0 cursor-pointer"
-                          title="Quitar hora de fin"
-                          aria-label="Quitar hora de fin"
-                        >
-                          <X className="w-4 h-4" />
-                        </button>
-                      )}
+                    <div className="relative min-w-0 flex-1">
+                      <input
+                        type="time"
+                        value={endTime}
+                        onChange={(e) => setEndTime(e.target.value)}
+                        className="w-full pl-6 sm:pl-7 pr-1 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-pink-400 text-xs sm:text-sm"
+                        title="Hora de fin (opcional)"
+                      />
+                      <Clock className="w-3 h-3 text-slate-400 absolute left-2 top-2.5 sm:top-3 pointer-events-none" />
                     </div>
                   </div>
                   <p className="text-[10px] text-slate-400 dark:text-slate-500 text-right">
