@@ -58,18 +58,6 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
     }
   }, [notifications]);
 
-  // Periodic reminder checking for scheduled alerts
-  useEffect(() => {
-    const check = () => {
-      notificationService.checkTaskReminders(tasks, (newAlert) => {
-        setNotifications((prev) => [newAlert, ...prev].slice(0, 25));
-      });
-    };
-
-    check();
-    const interval = setInterval(check, 45000);
-    return () => clearInterval(interval);
-  }, [tasks]);
 
   // Listen to remote partner actions (e.g., partner adds or completes a task)
   useEffect(() => {
