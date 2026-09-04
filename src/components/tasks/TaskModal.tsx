@@ -255,7 +255,7 @@ export const TaskModal: React.FC = () => {
                       <Clock className="w-3 h-3 text-slate-400 absolute left-2 top-2.5 sm:top-3 pointer-events-none" />
                     </div>
                     <span className="text-slate-400 dark:text-slate-500 text-xs font-bold flex-shrink-0">a</span>
-                    <div className="flex items-center gap-1 min-w-0 flex-1">
+                    <div className="flex items-center gap-2 min-w-0 flex-1">
                       <div className="relative min-w-0 flex-1">
                         <input
                           type="time"
@@ -270,10 +270,11 @@ export const TaskModal: React.FC = () => {
                         <button
                           type="button"
                           onClick={() => setEndTime('')}
-                          className="p-1.5 rounded-lg text-slate-400 hover:text-rose-500 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors flex-shrink-0"
+                          className="w-8 h-8 rounded-full flex items-center justify-center bg-slate-100 hover:bg-rose-50 dark:bg-slate-800 dark:hover:bg-rose-950/40 text-slate-400 hover:text-rose-500 border border-slate-200 dark:border-slate-700 shadow-xs transition-all flex-shrink-0 cursor-pointer"
                           title="Quitar hora de fin"
+                          aria-label="Quitar hora de fin"
                         >
-                          <X className="w-3.5 h-3.5" />
+                          <X className="w-4 h-4" />
                         </button>
                       )}
                     </div>
