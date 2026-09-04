@@ -253,7 +253,9 @@ export default async function handler(req, res) {
       const diffMs = now.getTime() - reminderTimeMs;
       const diffMinutes = Math.round(diffMs / 60000);
 
-      const isDue = diffMs >= 0 && diffMs <= 2 * 60 * 60 * 1000;
+      // Tight window of 150 seconds (2.5 min): perfectly matches the 1-minute cron-job interval,
+      // guaranteeing that tasks older than 2.5 minutes NEVER re-trigger on server restarts!
+      const isDue = diffMs >= 0 && diffMs <= 150 * 1000;
 
       debugTaskStatus.push({
         id: task.id,
